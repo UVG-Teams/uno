@@ -1,0 +1,10 @@
+/* html, body {
+    height: 100%;
+    margin: 0;
+} */
+
+.App {
+    /* background-color: #003366; */
+    min-height: 100vh;
+    /* margin: 0; */
+}
