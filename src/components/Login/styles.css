@@ -1,0 +1,20 @@
+.login_page {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #BFDBF7;
+}
+
+.login_form{
+    height: 80vh;
+    width: 80vw;
+    border-radius: 15px;
+    background-color: #ffffff;
+    box-shadow: 0px 0px 10px 1px black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;    
+}
