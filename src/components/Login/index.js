@@ -1,6 +1,7 @@
 import React from 'react';
 import { TextField, Button } from '@material-ui/core';
 
+import backCard from '../Resources/Deck.png'
 import './styles.css';
 
 
@@ -27,10 +28,16 @@ const Login = () => {
                         className='login_inputs'
                     />
                 </div>
-                <div className="login_button">
-                    <Button variant="contained" color="primary">Sign in</Button>
+                <div className='login_button'>
+                    <Button variant='contained' color='primary'>Sign in</Button>
                 </div>
-
+                <div className='login_img_container'>
+                    <div className='login_img_container2'>
+                        <img src={backCard} className='login_img' />
+                        <img src={backCard} className='login_img2' />
+                        <img src={backCard} className='login_img3' />
+                    </div>
+                </div>
             </div>
         </div>
     )
