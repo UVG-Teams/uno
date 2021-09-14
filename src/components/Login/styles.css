@@ -15,6 +15,27 @@
     box-shadow: 0px 0px 10px 1px black;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /* justify-content: center; */
     align-items: center;    
+}
+
+.login_title {
+    margin-top: 10%;
+}
+
+.inputs_login_form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 50%;
+    height: 22%;
+    /* background-color: burlywood; */
+    margin-top: 3%;
+
+}
+
+.login_button {
+    margin-top: 2%;
+    /* background-color: chartreuse; */
+    width: 50%;
 }
