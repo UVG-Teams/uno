@@ -1,31 +1,40 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { Redirect } from "react-router-dom";
 import { TextField, Button } from '@material-ui/core';
 
 import './styles.css';
 import backCard from '../Resources/deck.png';
+import * as selectors from '../../reducers';
+import { actions } from '../../reducers/game';
 
 
-const Login = () => {
+const Login = ({ game, createGame }) => {
+
+    if (game) {
+        return <Redirect to="/game" />
+    }
+
     return (
-        <div className='login_page'>           
+        <div className='login_page'>
             <div className='login_form'>
 
                 <h1 className='login_title'>Sign in</h1>
 
                 <div className='inputs_login_form'>
                     <TextField
-                        id='standard-basic' 
+                        id='standard-basic'
                         label='Display Name'
                         className='login_inputs'
                     />
                     <TextField
-                        id='standard-basic' 
+                        id='standard-basic'
                         label='IP Adress'
                         // color='secondary'
                         className='login_inputs'
                     />
-                    <TextField 
-                        id='standard-basic' 
+                    <TextField
+                        id='standard-basic'
                         label='Room Code'
                         className='login_inputs'
                     />
@@ -36,7 +45,7 @@ const Login = () => {
                 </div>
 
                 <div className='login_button'>
-                    <Button onClick={ () => alert("HOLA") } variant='contained' color='primary'>Create Room</Button>
+                    <Button onClick={ createGame } variant='contained' color='primary'>Create Room</Button>
                 </div>
 
                 <div className='login_img_container'>
@@ -53,4 +62,19 @@ const Login = () => {
 }
 
 
-export default Login;
+export default connect(
+    state => ({
+        game: selectors.getGame(state),
+    }),
+    dispatch => ({
+        createGame() {
+            const data = {
+                roomName: "4F",
+                password: "12345",
+                isServer: true,
+            };
+
+            dispatch(actions.startCreatingGame(data));
+        }
+    })
+)(Login);
