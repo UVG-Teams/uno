@@ -1,0 +1,15 @@
+.chat_component {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-end;
+    justify-content: right;
+    width: 100vw;
+    height: 100vh;
+}
+
+.chat {
+    width: 25vw;
+    height: 50vh;
+    background-color: aqua;
+
+}
