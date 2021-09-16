@@ -1,0 +1,12 @@
+.receive_bubble_sender {
+    margin-left: 3%;
+}
+
+.receive_bubble_component {
+    background-color: cadetblue;
+    border-radius: 10px 10px 10px 0;
+    width: fit-content;
+    max-width: 80%;
+    padding: 3% 3% 3% 3%;
+    margin: 1% 0 0 2%;
+}
