@@ -5,16 +5,37 @@
     justify-content: right;
     width: 100vw;
     height: 100vh;
+
 }
 
 .chat {
     width: 25vw;
     height: 50vh;
     border-radius: 20px 20px 0 0;
-    background-color: #ffffff;
+    background-color: #edf0f6;
 }
 
 .chat_header {
     padding-left: 5%;
     border-bottom: #000000 1px solid;
+}
+
+.chat_messages {
+    /* background-color:darkmagenta; */
+    height: 70%;
+    overflow-y: scroll;
+}
+
+.chat_write_message {
+    margin: 3% 3% 0 3%;
+    /* background-color: rgb(173, 173, 173); */
+    background-color: white;
+    border-radius: 10px;
+    padding: 2%
+}
+
+.inpMessage {
+    padding: 2%;
+    border: 0;
+    font-size: 16px;
 }

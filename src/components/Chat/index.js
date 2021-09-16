@@ -18,6 +18,8 @@ const Chat = () => {
                     <ReceiveBubble />
                 </div>
                 <div className='chat_write_message'>
+                    <input type='text' placeholder='Write your message...' className='inpMessage'></input>
+                    <button>O</button>
                 </div>
             </div>
         </div>
