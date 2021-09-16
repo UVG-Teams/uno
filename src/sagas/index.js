@@ -2,9 +2,7 @@ import { fork, all } from 'redux-saga/effects';
 
 
 function* mainSaga(){
-    yield all([
-        
-    ])
+    yield all([])
 }
 
 export default mainSaga;
