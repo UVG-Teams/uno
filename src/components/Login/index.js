@@ -35,6 +35,10 @@ const Login = () => {
                     <Button variant='contained' color='primary'>Sign in</Button>
                 </div>
 
+                <div className='login_button'>
+                    <Button onClick={ () => alert("HOLA") } variant='contained' color='primary'>Create Room</Button>
+                </div>
+
                 <div className='login_img_container'>
                     <div className='login_img_container2'>
                         <img src={ backCard } className='login_img' />
