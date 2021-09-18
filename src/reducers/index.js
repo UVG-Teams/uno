@@ -6,4 +6,4 @@ export default combineReducers({
     game,
 });
 
-export const getGame = state => gameSelectors.getGame(state.game);
+export const getGameInfo = state => gameSelectors.getGameInfo(state.game);

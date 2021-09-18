@@ -9,9 +9,9 @@ import * as selectors from '../../reducers';
 import { actions } from '../../reducers/game';
 
 
-const Login = ({ game, createGame }) => {
+const Login = ({ gameInfo, createGame }) => {
 
-    if (game) {
+    if (gameInfo) {
         return <Redirect to="/game" />
     }
 
@@ -64,7 +64,7 @@ const Login = ({ game, createGame }) => {
 
 export default connect(
     state => ({
-        game: selectors.getGame(state),
+        gameInfo: selectors.getGameInfo(state),
     }),
     dispatch => ({
         createGame() {

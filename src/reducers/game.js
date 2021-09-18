@@ -7,6 +7,7 @@ export const types = {
     JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
     JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
     JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
+    CLOSE_GAME: 'CLOSE_GAME',
 };
 
 export const actions = {
@@ -22,6 +23,9 @@ export const actions = {
         type: types.CREATE_GAME_FAILED,
         payload: { error }
     }),
+    closeGame: () => ({
+        type: types.CLOSE_GAME
+    }),
     // startJoiningGame: () => ({
     //     type: types.JOIN_GAME_STARTED,
     //     payload: null
@@ -36,7 +40,7 @@ export const actions = {
     // }),
 };
 
-const game = (state = null, action) => {
+const gameInfo = (state = null, action) => {
     switch(action.type) {
         case types.CREATE_GAME_STARTED: {
             return action.payload;
@@ -45,6 +49,9 @@ const game = (state = null, action) => {
             return null;
         }
         case types.CREATE_GAME_FAILED: {
+            return null;
+        }
+        case types.CLOSE_GAME: {
             return null;
         }
         // case types.JOIN_GAME_STARTED: {
@@ -62,7 +69,7 @@ const game = (state = null, action) => {
 
 
 export default combineReducers({
-    game
+    gameInfo
 });
 
-export const getGame = state => state.game;
+export const getGameInfo = state => state.gameInfo;
