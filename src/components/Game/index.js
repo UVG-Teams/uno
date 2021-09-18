@@ -17,9 +17,9 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
         if (!socket || socket.readyState == WebSocket.CLOSED) {
-            connectWS()
+            connectWS();
         }
-    }, [])
+    }, []);
 
     if (!gameInfo) {
         return <Redirect to="/" />
@@ -46,7 +46,7 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
         // Listen for socket closes
         socket.onclose = () => endgame(socket);
         socket.onerror = () => endgame(socket);
-    }
+    };
 
     return (
         <div className='game_page'>
@@ -67,7 +67,7 @@ export default connect(
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
                 url: 'ws://localhost:8080'
-            }))
+            }));
         },
         endgame(socket) {
             socket.close();
