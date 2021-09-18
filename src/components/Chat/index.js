@@ -1,5 +1,7 @@
 import React from 'react';
 import { TextField, Button } from '@material-ui/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 import ReceiveBubble from './Receive_bubble';
 import SendBubble from './Send_bubble';
@@ -19,7 +21,7 @@ const Chat = () => {
                 </div>
                 <div className='chat_write_message'>
                     <input type='text' placeholder='Write your message...' className='inpMessage'></input>
-                    <button>O</button>
+                    <button className='btnMessage'><FontAwesomeIcon icon={faPaperPlane} size="2x" color="#ffffff" swapOpacity/></button>
                 </div>
             </div>
         </div>
