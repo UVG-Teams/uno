@@ -32,7 +32,7 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
             socket.send(
                 JSON.stringify({
                     sent_by: currentUser.username,
-                    text: `Hi! I am ${currentUser.username} and I'm listening!`,
+                    text: `Hola, soy ${currentUser.username}!`,
                     sent_at: Date.now(),
                 })
             );
