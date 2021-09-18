@@ -1,5 +1,9 @@
-import React , { useState } from 'react';
+import React , { useState, useEffect } from 'react';
 import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
+import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { Redirect } from "react-router-dom";
+import { TextField, Button } from '@material-ui/core';
 
 import blue_0 from '../Resources/blue_0.png';
 import blue_1 from '../Resources/blue_1.png';
@@ -11,9 +15,16 @@ import blue_6 from '../Resources/blue_6.png';
 import blue_7 from '../Resources/blue_7.png';
 import blue_8 from '../Resources/blue_8.png';
 import blue_9 from '../Resources/blue_9.png';
-import Chat from '../Chat';
+
+
 
 import './styles.css';
+import Chat from '../Chat';
+import * as selectors from '../../reducers';
+import * as gameState from '../../reducers/game';
+import * as socketState from '../../reducers/socket';
+import table_0 from '../Resources/table_0.png';
+
 
 
 // fake data generator
@@ -74,14 +85,50 @@ const getListStyle = isDraggingOver => ({
 });
 
 
-const Game = () => {
+const Game = ({ gameInfo, socket, connectWS, endgame }) => {
+
+    useEffect(() => {
+        // Validate if the websocket connection exists already
+        if (!socket || socket.readyState == WebSocket.CLOSED) {
+            connectWS();
+        }
+    }, []);
+
+    const [items, setItems] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},])
+    const [selected, setSelected] = useState([])
+
+    if (!gameInfo) {
+        return <Redirect to="/" />
+    };
+
+    if (socket) {
+        socket.onopen = function(event) {
+
+            // Send an initial message
+            socket.send(
+                JSON.stringify({
+                    message: 'Hi! I am Willi and I\'m listening!'
+                })
+            );
+
+        };
+
+        // Listen for messages
+        socket.onmessage = function(event) {
+            const messageData = JSON.parse(event.data);
+            console.log('Client received a message: ', messageData.message);
+        };
+
+        // Listen for socket closes
+        socket.onclose = () => endgame(socket);
+        socket.onerror = () => endgame(socket);
+    };
 
     // const state = {
     //     items: getItems(10),
     //     selected: getItems(5, 10)
     // };
-    const [items, setItems] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},])
-    const [selected, setSelected] = useState([])
+    
     
 
     /**
@@ -135,6 +182,10 @@ const Game = () => {
     
     return (
         <div>
+            <Button onClick={() => endgame(socket)} variant='contained' color='primary'>
+                Close
+            </Button>
+
             <DragDropContext onDragEnd={onDragEnd}>
                 <div style={{display: 'flex', width: '60vw', justifyContent: 'space-between'}}>
                     <Droppable droppableId="droppable" direction="horizontal">
@@ -210,4 +261,20 @@ const Game = () => {
     )
 }
 
-export default Game;
+export default connect(
+    state => ({
+        gameInfo: selectors.getGameInfo(state),
+        socket: selectors.getSocket(state),
+    }),
+    dispatch => ({
+        connectWS() {
+            dispatch(socketState.actions.startWSConnection({
+                url: 'ws://localhost:8080'
+            }));
+        },
+        endgame(socket) {
+            socket.close();
+            dispatch(gameState.actions.closeGame());
+        },
+    })
+)(Game);
