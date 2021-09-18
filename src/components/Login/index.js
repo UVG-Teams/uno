@@ -4,8 +4,8 @@ import { Redirect } from "react-router-dom";
 import { TextField, Button } from '@material-ui/core';
 
 import './styles.css';
-import backCard from '../Resources/deck.png';
 import * as selectors from '../../reducers';
+import backCard from '../Resources/deck.png';
 import { actions } from '../../reducers/game';
 
 
