@@ -2,12 +2,12 @@ import React from 'react';
 
 import './styles.css';
 
-const ReceiveBubble = () => {
+const ReceiveBubble = ({ username, text }) => {
     return (
-        <div style={{paddingTop: '3%'}}>
-            <label className='receive_bubble_sender'>User</label>
+        <div style={{ paddingTop: '3%' }}>
+            <label className='receive_bubble_sender'>{ username }</label>
             <div className='receive_bubble_component'>
-                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                <span>{ text }</span>
             </div>
         </div>
     )

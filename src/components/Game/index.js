@@ -1,8 +1,7 @@
 import React , { useState, useEffect } from 'react';
 import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
 import { connect } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import { Redirect } from "react-router-dom";
+import { Redirect } from 'react-router-dom';
 import { TextField, Button } from '@material-ui/core';
 
 import blue_0 from '../Resources/blue_0.png';
@@ -21,9 +20,11 @@ import blue_9 from '../Resources/blue_9.png';
 import './styles.css';
 import Chat from '../Chat';
 import * as selectors from '../../reducers';
-import * as gameState from '../../reducers/game';
-import * as socketState from '../../reducers/socket';
 import table_0 from '../Resources/table_0.png';
+import * as gameState from '../../reducers/game';
+import * as chatState from '../../reducers/chat';
+import * as socketState from '../../reducers/socket';
+
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 
 
@@ -87,13 +88,13 @@ const getListStyle = isDraggingOver => ({
 });
 
 
-const Game = ({ gameInfo, socket, connectWS, endgame }) => {
+const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMessage }) => {
 
     useEffect(() => {
         // Validate if the websocket connection exists already
         if (!socket || socket.readyState == WebSocket.CLOSED) {
             connectWS();
-        }
+        };
     }, []);
 
     const [items, setItems] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},{id: 'blue_4', content: 'blue_4'},{id: 'blue_5', content: 'blue_5'},{id: 'blue_6', content: 'blue_6'},{id: 'blue_7', content: 'blue_7'},])
@@ -101,25 +102,27 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
     const [selected, setSelected] = useState([{id: 'green_8', content: 'green_8'}])
 
     if (!gameInfo) {
-        return <Redirect to="/" />
+        return <Redirect to='/' />
     };
 
     if (socket) {
         socket.onopen = function(event) {
-
             // Send an initial message
             socket.send(
                 JSON.stringify({
-                    message: 'Hi! I am Willi and I\'m listening!'
+                    type: 'text',
+                    sent_by: currentUser.username,
+                    text: `Hola, soy ${currentUser.username}!`,
+                    sent_at: Date.now(),
                 })
             );
-
         };
 
         // Listen for messages
         socket.onmessage = function(event) {
             const messageData = JSON.parse(event.data);
-            console.log('Client received a message: ', messageData.message);
+            // TODO: validar si es mensaje de chat o de jugada de uno
+            receiveChatMessage(messageData);
         };
 
         // Listen for socket closes
@@ -255,6 +258,7 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
 
 export default connect(
     state => ({
+        currentUser: selectors.getCurrentUserInfo(state),
         gameInfo: selectors.getGameInfo(state),
         socket: selectors.getSocket(state),
     }),
@@ -268,5 +272,10 @@ export default connect(
             socket.close();
             dispatch(gameState.actions.closeGame());
         },
+        receiveChatMessage(messageData) {
+            dispatch(chatState.actions.receiveMessage({
+                ...messageData,
+            }));
+        }
     })
 )(Game);
