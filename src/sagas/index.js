@@ -1,10 +1,10 @@
 import { fork, all } from 'redux-saga/effects';
 
-// import { watchCreateWebSocketServer } from './game';
+import { watchWebSocketConnection } from './socket';
 
 function* mainSaga(){
     yield all([
-        // fork(watchCreateWebSocketServer),
+        fork(watchWebSocketConnection),
     ])
 }
 
