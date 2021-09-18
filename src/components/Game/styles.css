@@ -1,7 +1,46 @@
 .game_page {
     height: 100vh;
     width: 100vw;
-    /* background-color: aqua; */
     background-image: url('../Resources/table_0.png');
     background-size: contain;
+    /* display: flex;
+    flex-direction: column; */
+    position: relative;
+}
+
+.dnd {
+    /* background-color: yellowgreen; */
+    height: 100%;
+    
+}
+
+.droppables {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 100%;
+}
+
+.game_cards {
+    width: 10.6vw;
+}
+
+.main_game_card {
+    width: 13vw;
+}
+
+.take_card {
+    width: 13vw;
+    height: 32vh;
+}
+
+.deck_droppable {
+    max-width: 74.5%;
+    overflow-x: scroll;
+}
+
+.table_deck_droppable {
+    /* background-color: violet; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

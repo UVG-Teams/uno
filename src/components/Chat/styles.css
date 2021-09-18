@@ -1,10 +1,14 @@
 .chat_component {
-    display: flex;
+    /* display: flex;
     flex-direction: row-reverse;
     align-items: flex-end;
     justify-content: right;
+    background-color: green;
     width: 100vw;
-    height: 100vh;
+    height: 100vh; */
+    position: absolute;
+    bottom: 0;
+    right: 0;
 
 }
 
@@ -17,18 +21,17 @@
 
 .chat_header {
     padding-left: 5%;
+    padding-top: 1%;
     border-bottom: #000000 1px solid;
 }
 
 .chat_messages {
-    /* background-color:darkmagenta; */
     height: 70%;
     overflow-y: scroll;
 }
 
 .chat_write_message {
     margin: 3% 3% 0 3%;
-    /* background-color: rgb(173, 173, 173); */
     background-color: white;
     border-radius: 10px;
     padding: 2%;
