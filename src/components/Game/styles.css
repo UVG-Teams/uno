@@ -1,11 +1,22 @@
 .game_page {
     height: 100vh;
     width: 100vw;
-    /* background-color: aqua; */
     background-image: url('../Resources/table_0.png');
     background-size: contain;
+    /* display: flex;
+    flex-direction: column; */
+    position: relative;
 }
 
-.item {
-    background-image: url('../Resources/table_0.png');
-  }
+.dnd {
+    /* background-color: yellowgreen; */
+    height: 100%;
+    
+}
+
+.droppables {
+    display: flex;
+    flex-direction: column-reverse;
+    /* background-color: violet; */
+    height: 100%;
+}
