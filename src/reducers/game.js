@@ -49,40 +49,40 @@ const gameInfo = (state = null, action) => {
     switch(action.type) {
         case types.CREATE_GAME_STARTED: {
             return action.payload;
-        }
+        };
         case types.CREATE_GAME_COMPLETED: {
             return null;
-        }
+        };
         case types.CREATE_GAME_FAILED: {
             return null;
-        }
+        };
         case types.CLOSE_GAME: {
             return null;
-        }
+        };
         // case types.JOIN_GAME_STARTED: {
         //     return null;
-        // }
+        // };
         // case types.JOIN_GAME_COMPLETED: {
         //     return action.payload;
-        // }
+        // };
         // case types.JOIN_GAME_FAILED: {
         //     return null;
-        // }
+        // };
         default: return state;
-    }
+    };
 };
 
 const currentUserInfo = (state = null, action) => {
     switch(action.type) {
         case types.CURRENT_USER_INFO_SETTED: {
             return action.payload;
-        }
+        };
         case types.CLOSE_GAME: {
             return null;
-        }
+        };
         default: return state;
-    }
-}
+    };
+};
 
 
 export default combineReducers({

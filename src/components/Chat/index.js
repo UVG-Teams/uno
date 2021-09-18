@@ -49,8 +49,8 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default connect(
     state => ({

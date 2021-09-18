@@ -78,6 +78,11 @@ export default connect(
     }),
     dispatch => ({
         createGame(username, roomCode, password) {
+
+            if (!username || username == "") {
+                return
+            }
+
             const gameData = {
                 roomCode: "4F",
                 password: "12345",

@@ -23,15 +23,15 @@ const messages = (state = [], action) => {
     switch(action.type) {
         case types.MESSAGE_SENDED: {
             return [ ...state, action.payload ];
-        }
+        };
         case types.MESSAGE_RECEIVED: {
             return [ ...state, action.payload ];
-        }
+        };
         case gameState.types.CLOSE_GAME: {
             return [];
-        }
+        };
         default: return state;
-    }
+    };
 };
 
 
