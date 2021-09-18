@@ -1,8 +1,11 @@
 import { fork, all } from 'redux-saga/effects';
 
+import { watchWebSocketConnection } from './socket';
 
 function* mainSaga(){
-    yield all([])
+    yield all([
+        fork(watchWebSocketConnection),
+    ])
 }
 
 export default mainSaga;

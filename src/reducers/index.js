@@ -1,6 +1,12 @@
 import { combineReducers } from 'redux';
 
+import game, * as gameSelectors from './game';
+import socket, * as socketSelectors from './socket';
 
-const reducer = combineReducers({});
+export default combineReducers({
+    game,
+    socket
+});
 
-export default reducer;
+export const getGameInfo = state => gameSelectors.getGameInfo(state.game);
+export const getSocket = state => socketSelectors.getSocket(state.socket);
