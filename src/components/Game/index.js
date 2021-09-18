@@ -1,19 +1,29 @@
 import React , { useState } from 'react';
 import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
-import uuid from 'uuid/v4';
 
-import table_0 from '../Resources/table_0.png'
+import blue_0 from '../Resources/blue_0.png';
+import blue_1 from '../Resources/blue_1.png';
+import blue_2 from '../Resources/blue_2.png';
+import blue_3 from '../Resources/blue_3.png';
+import blue_4 from '../Resources/blue_4.png';
+import blue_5 from '../Resources/blue_5.png';
+import blue_6 from '../Resources/blue_6.png';
+import blue_7 from '../Resources/blue_7.png';
+import blue_8 from '../Resources/blue_8.png';
+import blue_9 from '../Resources/blue_9.png';
 import Chat from '../Chat';
 
 import './styles.css';
 
 
 // fake data generator
-const getItems = (count, offset = 0) =>
-    Array.from({ length: count }, (v, k) => k).map(k => ({
-        id: `item-${k + offset}`,
-        content: `item ${k + offset}`
-    }));
+// const getItems = (count, offset = 0) =>
+//     Array.from({ length: count }, (v, k) => k).map(k => ({
+//         id: `item-${k + offset}`,
+//         content: `item ${k + offset}`
+//     }));
+
+
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -29,7 +39,8 @@ const reorder = (list, startIndex, endIndex) => {
  */
 const move = (source, destination, droppableSource, droppableDestination) => {
     const sourceClone = Array.from(source);
-    const destClone = Array.from(destination);
+    // const destClone = Array.from(destination);
+    const destClone = [];
     const [removed] = sourceClone.splice(droppableSource.index, 1);
 
     destClone.splice(droppableDestination.index, 0, removed);
@@ -69,8 +80,8 @@ const Game = () => {
     //     items: getItems(10),
     //     selected: getItems(5, 10)
     // };
-    const [items, setItems] = useState(getItems(10))
-    const [selected, setSelected] = useState(getItems(5, 10))
+    const [items, setItems] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},])
+    const [selected, setSelected] = useState([])
     
 
     /**
@@ -93,6 +104,10 @@ const Game = () => {
             return;
         }
 
+        if (source.droppableId == 'droppable2') {
+            return;
+        }
+
         if (source.droppableId === destination.droppableId) {
             const items = reorder(
                 getList(source.droppableId),
@@ -100,13 +115,6 @@ const Game = () => {
                 destination.index
             );
 
-            // let state = { items };
-
-            // if (source.droppableId === 'droppable2') {
-            //     state = { selected: items };
-            // }
-
-            // setState(state);
             if (source.droppableId == 'droppable2'){
                 setSelected(items)
             } else {
@@ -129,7 +137,7 @@ const Game = () => {
         <div>
             <DragDropContext onDragEnd={onDragEnd}>
                 <div style={{display: 'flex', width: '60vw', justifyContent: 'space-between'}}>
-                    <Droppable droppableId="droppable">
+                    <Droppable droppableId="droppable" direction="horizontal">
                         {(provided, snapshot) => (
                             <div
                                 ref={provided.innerRef}
@@ -148,7 +156,8 @@ const Game = () => {
                                                     snapshot.isDragging,
                                                     provided.draggableProps.style
                                                 )}>
-                                                {item.content}
+                                                {/* {item.content} */}
+                                                <img src={`/images/${item.content}.png`} style={{width: '50%'}}/>
                                             </div>
                                         )}
                                     </Draggable>
@@ -176,7 +185,8 @@ const Game = () => {
                                                     snapshot.isDragging,
                                                     provided.draggableProps.style
                                                 )}>
-                                                {item.content}
+                                                <img src={`/images/${item.content}.png`} style={{width: '50%'}}/>
+
                                             </div>
                                         )}
                                     </Draggable>
