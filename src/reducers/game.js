@@ -84,10 +84,37 @@ const currentUserInfo = (state = null, action) => {
     };
 };
 
+const players = (state = [], action) => {
+    switch(action.type) {
+        default: return state;
+    };
+};
+
+const myCards = (state = [], action) => {
+    switch(action.type) {
+        default: return state;
+    };
+};
+
+const currentCard = (state = null, action) => {
+    switch(action.type) {
+        default: return state;
+    };
+};
+
+const deck = (state = [], action) => {
+    switch(action.type) {
+        default: return state;
+    };
+};
 
 export default combineReducers({
     gameInfo,
     currentUserInfo,
+    players,
+    myCards,
+    currentCard,
+    deck,
 });
 
 export const getGameInfo = state => state.gameInfo;
