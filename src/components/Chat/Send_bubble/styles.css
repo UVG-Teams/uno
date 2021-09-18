@@ -1,0 +1,13 @@
+.sender {
+    align-self: flex-start;
+    margin-left: 13%;
+}
+
+.sender_bubble_component {
+    background-color:#cfd3e4;
+    border-radius: 10px 10px 0 10px;
+    width: fit-content;
+    max-width: 80%;
+    padding: 3% 3% 3% 3%;
+    margin: 1% 2% 0 0;
+}
