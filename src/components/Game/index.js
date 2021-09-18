@@ -14,7 +14,12 @@ import table_0 from '../Resources/table_0.png';
 
 const Game = ({ gameInfo, socket, connectWS, endgame }) => {
 
-    useEffect(() => connectWS(), [])
+    useEffect(() => {
+        // Validate if the websocket connection exists already
+        if (!socket || socket.readyState == WebSocket.CLOSED) {
+            connectWS()
+        }
+    }, [])
 
     if (!gameInfo) {
         return <Redirect to="/" />

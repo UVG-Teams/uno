@@ -7,7 +7,7 @@ const ReceiveBubble = () => {
         <div style={{paddingTop: '3%'}}>
             <label className='receive_bubble_sender'>User</label>
             <div className='receive_bubble_component'>
-                <text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</text>
+                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
             </div>
         </div>
     )
