@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from "react-router-dom";
 import { TextField, Button } from '@material-ui/core';
@@ -11,9 +11,13 @@ import { actions } from '../../reducers/game';
 
 const Login = ({ gameInfo, createGame }) => {
 
+    const [username, setUsername] = useState('');
+    const [roomCode, setRoomCode] = useState('');
+    const [password, setPassword] = useState('');
+
     if (gameInfo) {
         return <Redirect to="/game" />
-    }
+    };
 
     return (
         <div className='login_page'>
@@ -26,17 +30,23 @@ const Login = ({ gameInfo, createGame }) => {
                         id='standard-basic'
                         label='Display Name'
                         className='login_inputs'
-                    />
-                    <TextField
-                        id='standard-basic'
-                        label='IP Adress'
-                        // color='secondary'
-                        className='login_inputs'
+                        value={ username }
+                        onChange={ e => setUsername(e.target.value) }
                     />
                     <TextField
                         id='standard-basic'
                         label='Room Code'
+                        // color='secondary'
                         className='login_inputs'
+                        value={ roomCode }
+                        onChange={ e => setRoomCode(e.target.value) }
+                    />
+                    <TextField
+                        id='standard-basic'
+                        label='Room Password'
+                        className='login_inputs'
+                        value={ password }
+                        onChange={ e => setPassword(e.target.value) }
                     />
                 </div>
 
@@ -45,7 +55,7 @@ const Login = ({ gameInfo, createGame }) => {
                 </div>
 
                 <div className='login_button'>
-                    <Button onClick={ createGame } variant='contained' color='primary'>Create Room</Button>
+                    <Button onClick={ () => createGame(username, roomCode, password) } variant='contained' color='primary'>Create Room</Button>
                 </div>
 
                 <div className='login_img_container'>
@@ -58,8 +68,8 @@ const Login = ({ gameInfo, createGame }) => {
 
             </div>
         </div>
-    )
-}
+    );
+};
 
 
 export default connect(
@@ -67,14 +77,18 @@ export default connect(
         gameInfo: selectors.getGameInfo(state),
     }),
     dispatch => ({
-        createGame() {
-            const data = {
-                roomName: "4F",
+        createGame(username, roomCode, password) {
+            const gameData = {
+                roomCode: "4F",
                 password: "12345",
-                isServer: true,
             };
 
-            dispatch(actions.startCreatingGame(data));
+            const userData = {
+                username: username,
+            };
+
+            dispatch(actions.startCreatingGame(gameData));
+            dispatch(actions.setCurrentUserInfo(userData));
         }
     })
 )(Login);
