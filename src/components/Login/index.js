@@ -86,6 +86,7 @@ export default connect(
             const gameData = {
                 roomCode: "4F",
                 password: "12345",
+                roomOwner: username
             };
 
             const userData = {

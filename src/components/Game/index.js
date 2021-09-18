@@ -27,16 +27,15 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
 
     if (socket) {
         socket.onopen = function(event) {
-
             // Send an initial message
             socket.send(
                 JSON.stringify({
+                    type: 'text',
                     sent_by: currentUser.username,
                     text: `Hola, soy ${currentUser.username}!`,
                     sent_at: Date.now(),
                 })
             );
-
         };
 
         // Listen for messages

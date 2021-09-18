@@ -61,15 +61,13 @@ export default connect(
     dispatch => ({
         sendMessage(currentUser, socket, messageText) {
             const message = {
+                type: 'text',
                 sent_by: currentUser.username,
                 text: messageText,
                 sent_at: Date.now(),
             };
 
-            socket.send(
-                JSON.stringify(message)
-            );
-
+            socket.send(JSON.stringify(message));
             dispatch(chatState.actions.sendMessage(message));
         }
     }),
