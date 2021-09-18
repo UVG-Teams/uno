@@ -33,6 +33,11 @@
     height: 32vh;
 }
 
+.deck_droppable {
+    max-width: 74.5%;
+    overflow-x: scroll;
+}
+
 .table_deck_droppable {
     /* background-color: violet; */
     display: flex;
