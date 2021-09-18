@@ -4,10 +4,11 @@ export const types = {
     CREATE_GAME_STARTED: 'CREATE_GAME_STARTED',
     CREATE_GAME_COMPLETED: 'CREATE_GAME_COMPLETED',
     CREATE_GAME_FAILED: 'CREATE_GAME_FAILED',
-    JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
-    JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
-    JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
     CLOSE_GAME: 'CLOSE_GAME',
+    CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
+    // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
+    // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
+    // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
 };
 
 export const actions = {
@@ -25,6 +26,10 @@ export const actions = {
     }),
     closeGame: () => ({
         type: types.CLOSE_GAME
+    }),
+    setCurrentUserInfo: userInfo => ({
+        type: types.CURRENT_USER_INFO_SETTED,
+        payload: userInfo
     }),
     // startJoiningGame: () => ({
     //     type: types.JOIN_GAME_STARTED,
@@ -67,9 +72,23 @@ const gameInfo = (state = null, action) => {
     }
 };
 
+const currentUserInfo = (state = null, action) => {
+    switch(action.type) {
+        case types.CURRENT_USER_INFO_SETTED: {
+            return action.payload;
+        }
+        case types.CLOSE_GAME: {
+            return null;
+        }
+        default: return state;
+    }
+}
+
 
 export default combineReducers({
-    gameInfo
+    gameInfo,
+    currentUserInfo,
 });
 
 export const getGameInfo = state => state.gameInfo;
+export const getCurrentUserInfo = state => state.currentUserInfo;

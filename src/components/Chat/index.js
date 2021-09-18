@@ -12,7 +12,7 @@ import * as chatState from '../../reducers/chat';
 
 
 
-const Chat = ({ chat_messages, sendMessage }) => {
+const Chat = ({ currentUser, chat_messages, sendMessage }) => {
 
     const [messageText, setMessageText] = useState('');
 
@@ -24,13 +24,13 @@ const Chat = ({ chat_messages, sendMessage }) => {
                 </div>
                 <div className='chat_messages'>
                     {
-                        chat_messages.map(chat_message => {
-                            const tag_key = `${chat_message.sent_by}-${new Date()}-${chat_message.text}`
+                        chat_messages.map(msg => {
+                            const tag_key = `${msg.sent_by}-${msg.sent_at}-${msg.text}`
 
-                            if (chat_message.sent_by != 'Willi') {
-                                return <ReceiveBubble key={ tag_key } username={ chat_message.sent_by } text={ chat_message.text } />
+                            if (msg.sent_by != currentUser.username) {
+                                return <ReceiveBubble key={ tag_key } username={ msg.sent_by } text={ msg.text } />
                             } else {
-                                return <SendBubble key={ tag_key } text={ chat_message.text } />
+                                return <SendBubble key={ tag_key } text={ msg.text } />
                             }
                         })
                     }
@@ -54,14 +54,16 @@ const Chat = ({ chat_messages, sendMessage }) => {
 
 export default connect(
     state => ({
+        currentUser: selectors.getCurrentUserInfo(state),
         socket: selectors.getSocket(state),
         chat_messages: selectors.getMessages(state),
     }),
     dispatch => ({
-        sendMessage(socket, messageText) {
+        sendMessage(currentUser, socket, messageText) {
             const message = {
+                sent_by: currentUser.username,
                 text: messageText,
-                sent_by: "Willi",
+                sent_at: Date.now(),
             };
 
             socket.send(
@@ -76,7 +78,7 @@ export default connect(
         ...stateProps,
         ...ownProps,
         sendMessage(messageText) {
-            dispatchProps.sendMessage(stateProps.socket, messageText)
+            dispatchProps.sendMessage(stateProps.currentUser, stateProps.socket, messageText)
         }
     })
 )(Chat);

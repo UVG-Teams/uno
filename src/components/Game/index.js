@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from "react-router-dom";
+import { Redirect } from 'react-router-dom';
 import { TextField, Button } from '@material-ui/core';
 
 import './styles.css';
@@ -12,7 +12,7 @@ import * as chatState from '../../reducers/chat';
 import * as socketState from '../../reducers/socket';
 
 
-const Game = ({ gameInfo, socket, connectWS, endgame, receiveChatMessage }) => {
+const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMessage }) => {
 
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -22,7 +22,7 @@ const Game = ({ gameInfo, socket, connectWS, endgame, receiveChatMessage }) => {
     }, []);
 
     if (!gameInfo) {
-        return <Redirect to="/" />
+        return <Redirect to='/' />
     };
 
     if (socket) {
@@ -31,8 +31,9 @@ const Game = ({ gameInfo, socket, connectWS, endgame, receiveChatMessage }) => {
             // Send an initial message
             socket.send(
                 JSON.stringify({
-                    text: 'Hi! I am Willi and I\'m listening!',
-                    sent_by: "Willi",
+                    sent_by: currentUser.username,
+                    text: `Hi! I am ${currentUser.username} and I'm listening!`,
+                    sent_at: Date.now(),
                 })
             );
 
@@ -62,6 +63,7 @@ const Game = ({ gameInfo, socket, connectWS, endgame, receiveChatMessage }) => {
 
 export default connect(
     state => ({
+        currentUser: selectors.getCurrentUserInfo(state),
         gameInfo: selectors.getGameInfo(state),
         socket: selectors.getSocket(state),
     }),
