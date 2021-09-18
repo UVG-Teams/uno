@@ -84,8 +84,6 @@ const getListStyle = isDraggingOver => ({
     padding: grid,
     // width: 250,
     display: 'flex',
-    maxWidth: '73%',
-    maxHeight: '60%',
 });
 
 
@@ -128,11 +126,6 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
         socket.onclose = () => endgame(socket);
         socket.onerror = () => endgame(socket);
     };
-
-    // const state = {
-    //     items: getItems(10),
-    //     selected: getItems(5, 10)
-    // };
     
     
 
@@ -186,77 +179,75 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
     };
     
     return (
-        <div>
-            <div className="game_page">
-                {/* <div>
-                    <Button onClick={() => endgame(socket)} variant='contained' color='primary'>
-                        Close
-                    </Button>
-                </div> */}
-                <div className='dnd'>
-                    <DragDropContext onDragEnd={onDragEnd}>
-                        <div className='droppables'>
-                            <Droppable droppableId="droppable" direction='horizontal'>
-                                {(provided, snapshot) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        style={getListStyle(snapshot.isDraggingOver)}>
-                                        {items.map((item, index) => (
-                                            <Draggable
-                                                key={item.id}
-                                                draggableId={item.id}
-                                                index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        style={getItemStyle(
-                                                            snapshot.isDragging,
-                                                            provided.draggableProps.style
-                                                        )}>
-                                                        <img src={`/images/${item.content}.png`} style={{width: '100%'}}/>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                            <Droppable droppableId="droppable2">
-                                {(provided, snapshot) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        style={getListStyle(snapshot.isDraggingOver)}>
-                                        {selected.map((item, index) => (
-                                            <Draggable
-                                                key={item.id}
-                                                draggableId={item.id}
-                                                index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        style={getItemStyle(
-                                                            snapshot.isDragging,
-                                                            // provided.draggableProps.style
-                                                        )}>
-                                                        <img src={`/images/${item.content}.png`}/>
+        <div className="game_page">
+            {/* <div>
+                <Button onClick={() => endgame(socket)} variant='contained' color='primary'>
+                    Close
+                </Button>
+            </div> */}
+            <div className='dnd'>
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <div className='droppables'>
+                        <Droppable droppableId="droppable" direction='horizontal'>
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    style={getListStyle(snapshot.isDraggingOver)}>
+                                    {items.map((item, index) => (
+                                        <Draggable
+                                            key={item.id}
+                                            draggableId={item.id}
+                                            index={index}>
+                                            {(provided, snapshot) => (
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                    style={getItemStyle(
+                                                        snapshot.isDragging,
+                                                        provided.draggableProps.style
+                                                    )}>
+                                                    <img src={`/images/${item.content}.png`} className='game_cards'/>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                        <Droppable droppableId="droppable2">
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    style={getListStyle(snapshot.isDraggingOver)}>
+                                    {selected.map((item, index) => (
+                                        <Draggable
+                                            key={item.id}
+                                            draggableId={item.id}
+                                            index={index}>
+                                            {(provided, snapshot) => (
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                    style={getItemStyle(
+                                                        snapshot.isDragging,
+                                                        provided.draggableProps.style
+                                                    )}>
+                                                    <img src={`/images/${item.content}.png`}style={{width: '100%'}}/>
 
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    </DragDropContext>
-                    <Chat/>
-                </div>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </div>
+                </DragDropContext>
+                <Chat/>
             </div>
         </div>
     )

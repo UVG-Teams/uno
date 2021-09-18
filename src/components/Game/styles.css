@@ -17,6 +17,9 @@
 .droppables {
     display: flex;
     flex-direction: column-reverse;
-    /* background-color: violet; */
     height: 100%;
+}
+
+.game_cards {
+    width: 18vh;
 }
