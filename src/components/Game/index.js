@@ -24,6 +24,7 @@ import * as selectors from '../../reducers';
 import * as gameState from '../../reducers/game';
 import * as socketState from '../../reducers/socket';
 import table_0 from '../Resources/table_0.png';
+import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -81,7 +82,8 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 const getListStyle = isDraggingOver => ({
     background: isDraggingOver ? 'lightblue' : 'lightgrey',
     padding: grid,
-    width: 250
+    width: 250,
+    display: 'flex'
 });
 
 
@@ -94,7 +96,8 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
         }
     }, []);
 
-    const [items, setItems] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},])
+    // const [items, setItems] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},{id: 'blue_4', content: 'blue_4'},{id: 'blue_5', content: 'blue_5'},{id: 'blue_6', content: 'blue_6'},{id: 'blue_7', content: 'blue_7'},])
+    const [items, setItems] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'}])
     const [selected, setSelected] = useState([])
 
     if (!gameInfo) {
@@ -182,82 +185,76 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
     
     return (
         <div>
-            <Button onClick={() => endgame(socket)} variant='contained' color='primary'>
-                Close
-            </Button>
+            <div className="game_page">
+                <Button onClick={() => endgame(socket)} variant='contained' color='primary'>
+                    Close
+                </Button>
 
-            <DragDropContext onDragEnd={onDragEnd}>
-                <div style={{display: 'flex', width: '60vw', justifyContent: 'space-between'}}>
-                    <Droppable droppableId="droppable" direction="horizontal">
-                        {(provided, snapshot) => (
-                            <div
-                                ref={provided.innerRef}
-                                style={getListStyle(snapshot.isDraggingOver)}>
-                                {items.map((item, index) => (
-                                    <Draggable
-                                        key={item.id}
-                                        draggableId={item.id}
-                                        index={index}>
-                                        {(provided, snapshot) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={getItemStyle(
-                                                    snapshot.isDragging,
-                                                    provided.draggableProps.style
-                                                )}>
-                                                {/* {item.content} */}
-                                                <img src={`/images/${item.content}.png`} style={{width: '50%'}}/>
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                    <Droppable droppableId="droppable2">
-                        {(provided, snapshot) => (
-                            <div
-                                ref={provided.innerRef}
-                                style={getListStyle(snapshot.isDraggingOver)}>
-                                {selected.map((item, index) => (
-                                    <Draggable
-                                        key={item.id}
-                                        draggableId={item.id}
-                                        index={index}>
-                                        {(provided, snapshot) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={getItemStyle(
-                                                    snapshot.isDragging,
-                                                    provided.draggableProps.style
-                                                )}>
-                                                <img src={`/images/${item.content}.png`} style={{width: '50%'}}/>
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <div style={{display: 'flex', width: '60vw', height: '90%' , backgroundColor: 'blue', flexDirection:'column-reverse'}}>
+                        <Droppable droppableId="droppable" direction='horizontal'>
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    style={getListStyle(snapshot.isDraggingOver)}>
+                                    {items.map((item, index) => (
+                                        <Draggable
+                                            key={item.id}
+                                            draggableId={item.id}
+                                            index={index}>
+                                            {(provided, snapshot) => (
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                    style={getItemStyle(
+                                                        snapshot.isDragging,
+                                                        provided.draggableProps.style
+                                                    )}>
+                                                    {/* {item.content} */}
+                                                    <img src={`/images/${item.content}.png`} style={{width: '50%'}}/>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                        <Droppable droppableId="droppable2">
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    style={getListStyle(snapshot.isDraggingOver)}>
+                                    {selected.map((item, index) => (
+                                        <Draggable
+                                            key={item.id}
+                                            draggableId={item.id}
+                                            index={index}>
+                                            {(provided, snapshot) => (
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                    style={getItemStyle(
+                                                        snapshot.isDragging,
+                                                        provided.draggableProps.style
+                                                    )}>
+                                                    <img src={`/images/${item.content}.png`} style={{width: '50%'}}/>
 
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </div>
-            </DragDropContext>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </div>
+                </DragDropContext>
+                <Chat />
+            </div>
         </div>
-        // <div className='game_page'>
-        //     <div>
-
-        //     </div>
-
-
-
-        //     <Chat />
-        // </div>
     )
 }
 
