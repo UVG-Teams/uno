@@ -21,5 +21,21 @@
 }
 
 .game_cards {
-    width: 18vh;
+    width: 10.6vw;
+}
+
+.main_game_card {
+    width: 13vw;
+}
+
+.take_card {
+    width: 13vw;
+    height: 32vh;
+}
+
+.table_deck_droppable {
+    /* background-color: violet; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
