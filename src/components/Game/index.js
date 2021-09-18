@@ -1,24 +1,24 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { useDispatch } from 'react-redux';
 import { Redirect } from "react-router-dom";
 import { TextField, Button } from '@material-ui/core';
 
 import './styles.css';
 import Chat from '../Chat';
 import * as selectors from '../../reducers';
-import * as gameState from '../../reducers/game';
-import * as socketState from '../../reducers/socket';
 import table_0 from '../Resources/table_0.png';
+import * as gameState from '../../reducers/game';
+import * as chatState from '../../reducers/chat';
+import * as socketState from '../../reducers/socket';
 
 
-const Game = ({ gameInfo, socket, connectWS, endgame }) => {
+const Game = ({ gameInfo, socket, connectWS, endgame, receiveChatMessage }) => {
 
     useEffect(() => {
         // Validate if the websocket connection exists already
         if (!socket || socket.readyState == WebSocket.CLOSED) {
             connectWS();
-        }
+        };
     }, []);
 
     if (!gameInfo) {
@@ -31,7 +31,8 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
             // Send an initial message
             socket.send(
                 JSON.stringify({
-                    message: 'Hi! I am Willi and I\'m listening!'
+                    text: 'Hi! I am Willi and I\'m listening!',
+                    sent_by: "Willi",
                 })
             );
 
@@ -40,7 +41,8 @@ const Game = ({ gameInfo, socket, connectWS, endgame }) => {
         // Listen for messages
         socket.onmessage = function(event) {
             const messageData = JSON.parse(event.data);
-            console.log('Client received a message: ', messageData.message);
+            // TODO: validar si es mensaje de chat o de jugada de uno
+            receiveChatMessage(messageData);
         };
 
         // Listen for socket closes
@@ -73,5 +75,10 @@ export default connect(
             socket.close();
             dispatch(gameState.actions.closeGame());
         },
+        receiveChatMessage(messageData) {
+            dispatch(chatState.actions.receiveMessage({
+                ...messageData,
+            }));
+        }
     })
 )(Game);
