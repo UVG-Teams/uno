@@ -19,7 +19,7 @@ const checkUserIsAuthenticated = screenComponent => {
     const isAuthenticated = true;
 
     if (isAuthenticated) {
-        return screenComponent
+        return screenComponent;
     };
 
     return Login;
