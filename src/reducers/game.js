@@ -89,7 +89,19 @@ const currentUserInfo = (state = null, action) => {
     };
 };
 
-const players = (state = [], action) => {
+const players = (state = [{
+    username: "Luca",
+    cards: 0,
+},{
+    username: "Marco",
+    cards: 6,
+},{
+    username: "Andy",
+    cards: 21,
+},{
+    username: "Block",
+    cards: 8,
+}], action) => {
     switch(action.type) {
         default: return state;
     };
@@ -128,7 +140,7 @@ const currentPlayedCard = (state = null, action) => {
     switch(action.type) {
         case types.CARD_MOVED: {
             if (action.payload.moved_to == 'currentPlayedCard') {
-                return action.payload.moved_card
+                return action.payload.moved_card;
             }
             return state;
         }
@@ -155,3 +167,4 @@ export const getGameInfo = state => state.gameInfo;
 export const getCurrentUserInfo = state => state.currentUserInfo;
 export const getCurrentPlayedCard = state => state.currentPlayedCard;
 export const getMyCards = state => state.myCards;
+export const getPlayers = state => state.players;
