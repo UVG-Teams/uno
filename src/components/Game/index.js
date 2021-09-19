@@ -6,6 +6,13 @@ import { TextField, Button } from '@material-ui/core';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 
 import deck from '../Resources/deck.png';
+import deck_2 from '../Resources/deck_2.png';
+import deck_3 from '../Resources/deck_3.png';
+import deck_4 from '../Resources/deck_4.png';
+import deck_5 from '../Resources/deck_5.png';
+import deck_6 from '../Resources/deck_6.png';
+import deck_7 from '../Resources/deck_7.png';
+import deck_7plus from '../Resources/deck_7+.png';
 
 import './styles.css';
 import Chat from '../Chat';
@@ -151,6 +158,22 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
                 </Button>
             </div>
             <div className='dnd'>
+                <div className='rival_deck_1'>
+                    <img src={deck_7} className='rival_cards'/>  
+                    <h2>Rival 1</h2>
+                </div>
+                <div className='rival_deck_2'>
+                    <img src={deck_4} className='rival_cards'/>  
+                    <h2>Rival 2</h2>
+                </div>
+                <div className='rival_deck_3'>
+                    <img src={deck_5} className='rival_cards'/>
+                    <h2>Rival 3</h2>
+                </div>
+                <div className='rival_deck_4'>
+                    <img src={deck_7plus} className='rival_cards'/>
+                    <h2>Rival 4</h2>
+                </div>
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className='droppables'>
                         <div className='deck_droppable'>
