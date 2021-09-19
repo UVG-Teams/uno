@@ -6,6 +6,7 @@ export const types = {
     CREATE_GAME_FAILED: 'CREATE_GAME_FAILED',
     CLOSE_GAME: 'CLOSE_GAME',
     CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
+    CARD_MOVED: 'CARD_MOVED',
     // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
     // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
     // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
@@ -30,6 +31,10 @@ export const actions = {
     setCurrentUserInfo: userInfo => ({
         type: types.CURRENT_USER_INFO_SETTED,
         payload: userInfo
+    }),
+    moveCard: movement => ({
+        type: types.CARD_MOVED,
+        payload: movement
     }),
     // startJoiningGame: () => ({
     //     type: types.JOIN_GAME_STARTED,
@@ -98,6 +103,12 @@ const myCards = (state = [], action) => {
 
 const currentPlayedCard = (state = null, action) => {
     switch(action.type) {
+        case types.CARD_MOVED: {
+            if (action.payload.moved_to == 'currentPlayedCard') {
+                return action.payload.moved_card
+            }
+            return state;
+        }
         default: return state;
     };
 };
@@ -119,3 +130,4 @@ export default combineReducers({
 
 export const getGameInfo = state => state.gameInfo;
 export const getCurrentUserInfo = state => state.currentUserInfo;
+export const getCurrentPlayedCard = state => state.currentPlayedCard;
