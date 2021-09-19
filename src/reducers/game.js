@@ -96,7 +96,7 @@ const myCards = (state = [], action) => {
     };
 };
 
-const currentCard = (state = null, action) => {
+const currentGameCard = (state = null, action) => {
     switch(action.type) {
         default: return state;
     };
@@ -113,7 +113,7 @@ export default combineReducers({
     currentUserInfo,
     players,
     myCards,
-    currentCard,
+    currentGameCard,
     deck,
 });
 

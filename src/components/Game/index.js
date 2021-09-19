@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom';
 import { TextField, Button } from '@material-ui/core';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 
-import deck from '../Resources/deck.png';
+import deck_1 from '../Resources/deck.png';
 import deck_2 from '../Resources/deck_2.png';
 import deck_3 from '../Resources/deck_3.png';
 import deck_4 from '../Resources/deck_4.png';
@@ -22,17 +22,6 @@ import * as gameState from '../../reducers/game';
 import * as chatState from '../../reducers/chat';
 import * as socketState from '../../reducers/socket';
 
-
-
-
-// Record the movement of cards (items)
-const reorder = (list, startIndex, endIndex) => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-
-    return result;
-};
 
 // Moves a card from my deck to the game deck (from one list to another list)
 const move = (source, destination, droppableSource, droppableDestination) => {
@@ -71,8 +60,8 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
         };
     }, []);
 
-    const [items, setItems] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},{id: 'blue_4', content: 'blue_4'},{id: 'blue_5', content: 'blue_5'},{id: 'blue_6', content: 'blue_6'},{id: 'blue_7', content: 'blue_7'},{id: 'blue_7', content: 'blue_7'},])
-    const [selected, setSelected] = useState([{id: 'green_8', content: 'green_8'}])
+    const [myDeck, setMyDeck] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},{id: 'blue_4', content: 'blue_4'},{id: 'blue_5', content: 'blue_5'},{id: 'blue_6', content: 'blue_6'},{id: 'blue_7_1', content: 'blue_7'},{id: 'blue_7_2', content: 'blue_7'},]);
+    const [gameDeck, setGameDeck] = useState([{id: 'green_8', content: 'green_8'}]);
 
     if (!gameInfo) {
         return <Redirect to='/' />
@@ -102,14 +91,14 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
         socket.onclose = () => endgame(socket);
         socket.onerror = () => endgame(socket);
     };
-    
+
     // Handle with multiple lists matching ids of the droppable container to the names in state.
     const id2List = {
-        droppable: 'items',
-        droppable2: 'selected'
+        myDeck: 'myDeck',
+        gameDeck: 'gameDeck'
     };
 
-    const getList = id => id2List[id] == 'items' ? items : selected; 
+    const getList = id => id2List[id] == 'myDeck' ? myDeck : gameDeck;
 
     const onDragEnd = result => {
         const { source, destination } = result;
@@ -120,23 +109,12 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
         }
 
         // Dropped in the own list, then return card to origin
-        if (source.droppableId == 'droppable2') {
+        if (source.droppableId == 'gameDeck') {
             return;
         }
 
         if (source.droppableId === destination.droppableId) {
-            // const items = reorder(
-            //     getList(source.droppableId),
-            //     source.index,
-            //     destination.index
-            // );
-
-            // if (source.droppableId == 'droppable2'){
-            //     setSelected(items)
-            // } else {
-            //     setItems(items)
-            // }
-            return
+            return;
         } else {
             const result = move(
                 getList(source.droppableId),
@@ -145,11 +123,11 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
                 destination
             );
 
-            setSelected(result.droppable2)
-            setItems(result.droppable)
-        }
+            setGameDeck(result.gameDeck);
+            setMyDeck(result.myDeck);
+        };
     };
-    
+
     return (
         <div className="game_page">
             <div style={{position: 'absolute'}}>
@@ -159,11 +137,11 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
             </div>
             <div className='dnd'>
                 <div className='rival_deck_1'>
-                    <img src={deck_7} className='rival_cards'/>  
+                    <img src={deck_7} className='rival_cards'/>
                     <h2>Rival 1</h2>
                 </div>
                 <div className='rival_deck_2'>
-                    <img src={deck_4} className='rival_cards'/>  
+                    <img src={deck_4} className='rival_cards'/>
                     <h2>Rival 2</h2>
                 </div>
                 <div className='rival_deck_3'>
@@ -177,12 +155,12 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className='droppables'>
                         <div className='deck_droppable'>
-                            <Droppable droppableId="droppable" direction='horizontal'>
+                            <Droppable droppableId="myDeck" direction='horizontal'>
                                 {(provided, snapshot) => (
                                     <div
                                         ref={provided.innerRef}
                                         style={getListStyle(snapshot.isDraggingOver)}>
-                                        {items.map((item, index) => (
+                                        {myDeck.map((item, index) => (
                                             <Draggable
                                                 key={item.id}
                                                 draggableId={item.id}
@@ -208,13 +186,13 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
                         </div>
                         <div className='table_deck_droppable'>
                             {/* TODO: Button agarrar carta */}
-                            <img src={deck} className='take_card'/>                  
-                            <Droppable droppableId="droppable2">
+                            <img src={deck_1} className='take_card'/>
+                            <Droppable droppableId="gameDeck">
                                 {(provided, snapshot) => (
                                     <div
                                         ref={provided.innerRef}
                                         style={getListStyle(snapshot.isDraggingOver)}>
-                                        {selected.map((item, index) => (
+                                        {gameDeck.map((item, index) => (
                                             <Draggable
                                                 key={item.id}
                                                 draggableId={item.id}
