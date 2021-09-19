@@ -1,9 +1,9 @@
 import React , { useState, useEffect } from 'react';
-import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { TextField, Button } from '@material-ui/core';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
 
 import deck_1 from '../Resources/deck.png';
 import deck_2 from '../Resources/deck_2.png';
@@ -27,15 +27,15 @@ import * as socketState from '../../reducers/socket';
 const move = (source, destination, droppableSource, droppableDestination) => {
     const sourceClone = Array.from(source);
     const destClone = [];
-    const [removed] = sourceClone.splice(droppableSource.index, 1);
+    const [moved_card] = sourceClone.splice(droppableSource.index, 1);
 
-    destClone.splice(droppableDestination.index, 0, removed);
+    destClone.splice(droppableDestination.index, 0, moved_card);
 
     const result = {};
     result[droppableSource.droppableId] = sourceClone;
     result[droppableDestination.droppableId] = destClone;
 
-    return result;
+    return { result, moved_card };
 };
 
 
@@ -52,7 +52,7 @@ const getListStyle = isDraggingOver => ({
 });
 
 
-const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMessage }) => {
+const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, currentPlayedCard, receiveChatMessage, receiveCardMovement }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
         if (!socket || socket.readyState == WebSocket.CLOSED) {
@@ -60,8 +60,8 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
         };
     }, []);
 
-    const [myDeck, setMyDeck] = useState([{id: 'blue_1', content: 'blue_1'},{id: 'blue_2', content: 'blue_2'},{id: 'blue_3', content: 'blue_3'},{id: 'blue_4', content: 'blue_4'},{id: 'blue_5', content: 'blue_5'},{id: 'blue_6', content: 'blue_6'},{id: 'blue_7_1', content: 'blue_7'},{id: 'blue_7_2', content: 'blue_7'},]);
-    const [gameDeck, setGameDeck] = useState([{id: 'green_8', content: 'green_8'}]);
+    const [myDeck, setMyDeck] = useState(myCards);
+    const [playedDeck, setPlayedDeck] = useState([currentPlayedCard]);
 
     if (!gameInfo) {
         return <Redirect to='/' />
@@ -84,7 +84,11 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
         socket.onmessage = function(event) {
             const messageData = JSON.parse(event.data);
             // TODO: validar si es mensaje de chat o de jugada de uno
-            receiveChatMessage(messageData);
+            console.log("New message", messageData);
+            switch(messageData.type) {
+                case 'text': receiveChatMessage(messageData);
+                case 'game_move': receiveCardMovement(messageData);
+            }
         };
 
         // Listen for socket closes
@@ -95,10 +99,10 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
     // Handle with multiple lists matching ids of the droppable container to the names in state.
     const id2List = {
         myDeck: 'myDeck',
-        gameDeck: 'gameDeck'
+        playedDeck: 'playedDeck'
     };
 
-    const getList = id => id2List[id] == 'myDeck' ? myDeck : gameDeck;
+    const getList = id => id2List[id] == 'myDeck' ? myDeck : playedDeck;
 
     const onDragEnd = result => {
         const { source, destination } = result;
@@ -108,28 +112,38 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
             return;
         }
 
-        // Dropped in the own list, then return card to origin
-        if (source.droppableId == 'gameDeck') {
+        // Can't move out the card on the game deck
+        if (source.droppableId == 'playedDeck') {
             return;
         }
 
+        // Can't reorder cards
         if (source.droppableId === destination.droppableId) {
             return;
         } else {
-            const result = move(
+            const { result, moved_card } = move(
                 getList(source.droppableId),
                 getList(destination.droppableId),
                 source,
                 destination
             );
 
-            setGameDeck(result.gameDeck);
+            socket.send(
+                JSON.stringify({
+                    type: 'game_move',
+                    sent_by: currentUser.username,
+                    moved_card: moved_card.id,
+                    sent_at: Date.now(),
+                })
+            );
+
+            setPlayedDeck(result.playedDeck);
             setMyDeck(result.myDeck);
         };
     };
 
     return (
-        <div className="game_page">
+        <div className='game_page'>
             <div style={{position: 'absolute'}}>
                 <Button onClick={() => endgame(socket)} variant='contained' color='primary'>
                     Close
@@ -155,7 +169,7 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className='droppables'>
                         <div className='deck_droppable'>
-                            <Droppable droppableId="myDeck" direction='horizontal'>
+                            <Droppable droppableId='myDeck' direction='horizontal'>
                                 {(provided, snapshot) => (
                                     <div
                                         ref={provided.innerRef}
@@ -187,12 +201,12 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
                         <div className='table_deck_droppable'>
                             {/* TODO: Button agarrar carta */}
                             <img src={deck_1} className='take_card'/>
-                            <Droppable droppableId="gameDeck">
+                            <Droppable droppableId='playedDeck'>
                                 {(provided, snapshot) => (
                                     <div
                                         ref={provided.innerRef}
                                         style={getListStyle(snapshot.isDraggingOver)}>
-                                        {gameDeck.map((item, index) => (
+                                        {playedDeck.map((item, index) => (
                                             <Draggable
                                                 key={item.id}
                                                 draggableId={item.id}
@@ -207,7 +221,6 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
                                                             provided.draggableProps.style
                                                         )}>
                                                         <img src={`/images/${item.content}.png`} className='main_game_card'/>
-
                                                     </div>
                                                 )}
                                             </Draggable>
@@ -230,6 +243,32 @@ export default connect(
         currentUser: selectors.getCurrentUserInfo(state),
         gameInfo: selectors.getGameInfo(state),
         socket: selectors.getSocket(state),
+        currentPlayedCard: { id: 'green_8', content: 'green_8' },
+        myCards: [{
+            id: 'blue_1',
+            content: 'blue_1'
+        }, {
+            id: 'blue_2',
+            content: 'blue_2'
+        }, {
+            id: 'green_3',
+            content: 'green_3'
+        }, {
+            id: 'blue_4',
+            content: 'blue_4'
+        }, {
+            id: 'blue_5',
+            content: 'blue_5'
+        }, {
+            id: 'blue_6',
+            content: 'blue_6'
+        }, {
+            id: 'blue_7_1',
+            content: 'blue_7'
+        }, {
+            id: 'blue_7_2',
+            content: 'blue_7'
+        }]
     }),
     dispatch => ({
         connectWS() {
@@ -245,6 +284,9 @@ export default connect(
             dispatch(chatState.actions.receiveMessage({
                 ...messageData,
             }));
+        },
+        receiveCardMovement(messageData) {
+            // dispatch()
         }
     })
 )(Game);
