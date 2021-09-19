@@ -33,6 +33,34 @@
     height: 32vh;
 }
 
+.rival_deck_1, .rival_deck_2, .rival_deck_3, .rival_deck_4  {
+    position: absolute;
+    display: inline;
+}
+
+.rival_deck_1 {
+    margin-top: 20%;
+    margin-left: 10%;
+    /* transform: rotate(90deg) */
+}
+
+.rival_deck_2 {
+    margin-top: 2%;
+    margin-left: 35%;
+    /* transform: rotate(180deg) */
+}
+
+.rival_deck_3 {
+    margin-top: 13%;
+    right: 0;
+    /* transform: rotate(-130deg) */
+}
+
+.rival_cards {
+    width: 10vw;
+    height: 14vh;
+}
+
 .deck_droppable {
     max-width: 74.5%;
     overflow-x: scroll;
