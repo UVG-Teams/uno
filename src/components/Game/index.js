@@ -65,6 +65,7 @@ const Game = ({
     receiveChatMessage,
     receiveCardMovement,
     receiveNewUser,
+    removePlayer,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -105,16 +106,28 @@ const Game = ({
                     break;
                 };
                 case 'sign_in': {
+                    // TODO: validar que no haya un user con ese nombre
                     receiveChatMessage(messageData);
                     receiveNewUser(messageData);
                     break;
                 };
+                case 'leave_game': {
+                    receiveChatMessage({
+                        type: 'text',
+                        sent_by: messageData.sent_by,
+                        text: 'Adios',
+                        sent_at: messageData.sent_at,
+                    });
+                    removePlayer(messageData);
+                    break;
+                };
+                default: receiveChatMessage(messageData);
             }
         };
 
         // Listen for socket closes
-        socket.onclose = () => endgame(socket);
-        socket.onerror = () => endgame(socket);
+        socket.onclose = () => endgame();
+        socket.onerror = () => endgame();
     };
 
     // Handle with multiple lists matching ids of the droppable container to the names in state.
@@ -166,7 +179,7 @@ const Game = ({
     return (
         <div className='game_page'>
             <div style={{position: 'absolute'}}>
-                <Button onClick={() => endgame(socket)} variant='contained' color='primary'>
+                <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close
                 </Button>
             </div>
@@ -278,9 +291,8 @@ export default connect(
                 url: 'ws://localhost:8080'
             }));
         },
-        endgame(socket) {
-            socket.close();
-            dispatch(gameState.actions.closeGame());
+        endgame() {
+            dispatch(gameState.actions.startClosingGame());
         },
         receiveChatMessage(messageData) {
             dispatch(chatState.actions.receiveMessage({
@@ -306,6 +318,9 @@ export default connect(
             dispatch(gameState.actions.receiveNewUser({
                 username: messageData.sent_by,
             }))
+        },
+        removePlayer(messageData) {
+            dispatch(gameState.actions.removePlayer(messageData.sent_by));
         }
     })
 )(Game);

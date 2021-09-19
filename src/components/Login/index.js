@@ -6,10 +6,10 @@ import { TextField, Button } from '@material-ui/core';
 import './styles.css';
 import * as selectors from '../../reducers';
 import backCard from '../Resources/deck_1.png';
-import { actions } from '../../reducers/game';
+import * as gameState from '../../reducers/game';
 
 
-const Login = ({ gameInfo, createGame }) => {
+const Login = ({ gameInfo, createGame, endgame }) => {
 
     const [username, setUsername] = useState('');
     const [roomCode, setRoomCode] = useState('');
@@ -17,6 +17,9 @@ const Login = ({ gameInfo, createGame }) => {
 
     if (gameInfo) {
         return <Redirect to="/game" />
+    } else {
+        // Try to delete existing game
+        endgame()
     };
 
     return (
@@ -93,8 +96,11 @@ export default connect(
                 username: username,
             };
 
-            dispatch(actions.startCreatingGame(gameData));
-            dispatch(actions.setCurrentUserInfo(userData));
-        }
+            dispatch(gameState.actions.startCreatingGame(gameData));
+            dispatch(gameState.actions.setCurrentUserInfo(userData));
+        },
+        endgame() {
+            dispatch(gameState.actions.startClosingGame());
+        },
     })
 )(Login);

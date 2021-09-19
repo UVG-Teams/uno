@@ -1,11 +1,10 @@
 import { combineReducers } from 'redux';
 
-import * as gameState from './game';
-
 export const types = {
     WS_CONNECTION_STARTED: 'WS_CONNECTION_STARTED',
     WS_CONNECTION_COMPLETED: 'WS_CONNECTION_COMPLETED',
     WS_CONNECTION_FAILED: 'WS_CONNECTION_FAILED',
+    WS_CONNECTION_DESTROYED: 'WS_CONNECTION_DESTROYED',
 };
 
 export const actions = {
@@ -21,6 +20,9 @@ export const actions = {
         type: types.WS_CONNECTION_FAILED,
         payload: { error }
     }),
+    destroyWSConnection: () => ({
+        type: types.WS_CONNECTION_DESTROYED
+    })
 };
 
 const socket = (state = null, action) => {
@@ -34,7 +36,7 @@ const socket = (state = null, action) => {
         case types.WS_CONNECTION_FAILED: {
             return null;
         };
-        case gameState.types.CLOSE_GAME: {
+        case types.WS_CONNECTION_DESTROYED: {
             return null;
         };
         default: return state;

@@ -4,10 +4,12 @@ export const types = {
     CREATE_GAME_STARTED: 'CREATE_GAME_STARTED',
     CREATE_GAME_COMPLETED: 'CREATE_GAME_COMPLETED',
     CREATE_GAME_FAILED: 'CREATE_GAME_FAILED',
-    CLOSE_GAME: 'CLOSE_GAME',
+    CLOSE_GAME_STARTED: 'CLOSE_GAME_STARTED',
+    CLOSE_GAME_COMPLETED: 'CLOSE_GAME_COMPLETED',
     CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
     CARD_MOVED: 'CARD_MOVED',
     NEW_USER_RECEIVED: 'NEW_USER_RECEIVED',
+    PLAYER_REMOVED: 'PLAYER_REMOVED',
     // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
     // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
     // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
@@ -26,8 +28,11 @@ export const actions = {
         type: types.CREATE_GAME_FAILED,
         payload: { error }
     }),
-    closeGame: () => ({
-        type: types.CLOSE_GAME
+    startClosingGame: () => ({
+        type: types.CLOSE_GAME_STARTED,
+    }),
+    completeClosingGame: () => ({
+        type: types.CLOSE_GAME_COMPLETED,
     }),
     setCurrentUserInfo: userInfo => ({
         type: types.CURRENT_USER_INFO_SETTED,
@@ -41,6 +46,10 @@ export const actions = {
         type: types.NEW_USER_RECEIVED,
         payload: data
     }),
+    removePlayer: username => ({
+        type: types.PLAYER_REMOVED,
+        payload: username
+    })
     // startJoiningGame: () => ({
     //     type: types.JOIN_GAME_STARTED,
     //     payload: null
@@ -66,7 +75,7 @@ const gameInfo = (state = null, action) => {
         case types.CREATE_GAME_FAILED: {
             return null;
         };
-        case types.CLOSE_GAME: {
+        case types.CLOSE_GAME_COMPLETED: {
             return null;
         };
         // case types.JOIN_GAME_STARTED: {
@@ -87,7 +96,7 @@ const currentUserInfo = (state = null, action) => {
         case types.CURRENT_USER_INFO_SETTED: {
             return action.payload;
         };
-        case types.CLOSE_GAME: {
+        case types.CLOSE_GAME_COMPLETED: {
             return null;
         };
         default: return state;
@@ -105,6 +114,20 @@ const players = (state = [], action) => {
                 }
             ];
         };
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
+        case types.PLAYER_REMOVED: {
+            const newState = [];
+
+            state.map(player => {
+                if (player.username != action.payload) {
+                    newState.push(player);
+                };
+            });
+
+            return newState;
+        }
         default: return state;
     };
 };
@@ -122,18 +145,21 @@ const myCards = (state = [{
     switch(action.type) {
         case types.CARD_MOVED: {
             if (action.payload.moved_by_me) {
-                const new_state = [];
+                const newState = [];
 
                 state.map(card => {
                     if (card.id != action.payload.moved_card.id) {
-                        new_state.push(card);
+                        newState.push(card);
                     };
                 });
 
-                return new_state;
+                return newState;
             }
             return state;
-        }
+        };
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
         default: return state;
     };
 };
@@ -145,13 +171,19 @@ const currentPlayedCard = (state = null, action) => {
                 return action.payload.moved_card;
             }
             return state;
-        }
+        };
+        case types.CLOSE_GAME_COMPLETED: {
+            return null;
+        };
         default: return state;
     };
 };
 
 const deck = (state = [], action) => {
     switch(action.type) {
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
         default: return state;
     };
 };
