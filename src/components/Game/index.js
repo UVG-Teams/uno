@@ -21,6 +21,7 @@ import * as selectors from '../../reducers';
 import * as gameState from '../../reducers/game';
 import * as chatState from '../../reducers/chat';
 import * as socketState from '../../reducers/socket';
+import { counter } from '@fortawesome/fontawesome-svg-core';
 
 
 // Moves a card from my deck to the game deck (from one list to another list)
@@ -303,6 +304,7 @@ export default connect(
             }));
         },
         moveMyCard(moved_by, moved_card, moved_to) {
+            console.log(moved_by, moved_card, moved_to);
             dispatch(gameState.actions.moveCard({
                 moved_by: moved_by,
                 moved_card: moved_card,
