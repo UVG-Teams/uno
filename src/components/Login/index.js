@@ -5,7 +5,7 @@ import { TextField, Button } from '@material-ui/core';
 
 import './styles.css';
 import * as selectors from '../../reducers';
-import backCard from '../Resources/deck.png';
+import backCard from '../Resources/deck_1.png';
 import { actions } from '../../reducers/game';
 
 

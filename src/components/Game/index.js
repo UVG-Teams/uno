@@ -5,7 +5,7 @@ import { TextField, Button } from '@material-ui/core';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
 
-import deck_1 from '../Resources/deck.png';
+import deck_1 from '../Resources/deck_1.png';
 import deck_2 from '../Resources/deck_2.png';
 import deck_3 from '../Resources/deck_3.png';
 import deck_4 from '../Resources/deck_4.png';
@@ -52,7 +52,19 @@ const getListStyle = isDraggingOver => ({
 });
 
 
-const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, currentPlayedCard, moveMyCard, receiveChatMessage, receiveCardMovement }) => {
+const Game = ({
+    currentUser,
+    gameInfo,
+    socket,
+    connectWS,
+    endgame,
+    myCards,
+    currentPlayedCard,
+    players,
+    moveMyCard,
+    receiveChatMessage,
+    receiveCardMovement
+}) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
         if (!socket || socket.readyState == WebSocket.CLOSED) {
@@ -147,22 +159,26 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, curr
                 </Button>
             </div>
             <div className='dnd'>
-                <div className='rival_deck_1'>
-                    <img src={deck_7} className='rival_cards'/>
-                    <h2>Rival 1</h2>
-                </div>
-                <div className='rival_deck_2'>
-                    <img src={deck_4} className='rival_cards'/>
-                    <h2>Rival 2</h2>
-                </div>
-                <div className='rival_deck_3'>
-                    <img src={deck_5} className='rival_cards'/>
-                    <h2>Rival 3</h2>
-                </div>
-                <div className='rival_deck_4'>
-                    <img src={deck_7plus} className='rival_cards'/>
-                    <h2>Rival 4</h2>
-                </div>
+                {
+                    players.map((player, index) => {
+                        let deck_amount;
+
+                        if (player.cards == 0) {
+                            deck_amount = '1';
+                        } else if (player.cards > 7) {
+                            deck_amount = '7+';
+                        } else {
+                            deck_amount = player.cards;
+                        };
+
+                        return (
+                            <div key={ player.username } className={`rival_deck_${ index + 1 }`}>
+                                <img src={`/images/deck_${deck_amount}.png`} className='rival_cards' />
+                                <h2>{ player.username }</h2>
+                            </div>
+                        )
+                    })
+                }
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className='droppables'>
                         <div className='deck_droppable'>
@@ -241,7 +257,8 @@ export default connect(
         gameInfo: selectors.getGameInfo(state),
         socket: selectors.getSocket(state),
         currentPlayedCard: selectors.getCurrentPlayedCard(state) ? [selectors.getCurrentPlayedCard(state)] : [{ id: 'green_8', content: 'green_8' }],
-        myCards: selectors.getMyCards(state)
+        myCards: selectors.getMyCards(state),
+        players: selectors.getPlayers(state),
     }),
     dispatch => ({
         connectWS() {
