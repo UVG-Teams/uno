@@ -63,7 +63,8 @@ const Game = ({
     players,
     moveMyCard,
     receiveChatMessage,
-    receiveCardMovement
+    receiveCardMovement,
+    receiveNewUser,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -81,7 +82,7 @@ const Game = ({
             // Send an initial message
             socket.send(
                 JSON.stringify({
-                    type: 'text',
+                    type: 'sign_in',
                     sent_by: currentUser.username,
                     text: `Hola, soy ${currentUser.username}!`,
                     sent_at: Date.now(),
@@ -95,8 +96,19 @@ const Game = ({
             // TODO: validar si es mensaje de chat o de jugada de uno
             console.log("New message", messageData);
             switch(messageData.type) {
-                case 'text': receiveChatMessage(messageData);
-                case 'game_move': receiveCardMovement(messageData);
+                case 'text': {
+                    receiveChatMessage(messageData);
+                    break;
+                };
+                case 'game_move': {
+                    receiveCardMovement(messageData);
+                    break;
+                };
+                case 'sign_in': {
+                    receiveChatMessage(messageData);
+                    receiveNewUser(messageData);
+                    break;
+                };
             }
         };
 
@@ -288,6 +300,11 @@ export default connect(
                 moved_by: messageData.sent_by,
                 moved_card: messageData.moved_card,
                 moved_to: messageData.moved_to,
+            }))
+        },
+        receiveNewUser(messageData) {
+            dispatch(gameState.actions.receiveNewUser({
+                username: messageData.sent_by,
             }))
         }
     })
