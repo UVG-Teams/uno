@@ -160,15 +160,19 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, receiveChatMe
             <div className='dnd'>
                 <div className='rival_deck_1'>
                     <img src={deck_7} className='rival_cards'/>  
+                    <h2>Rival 1</h2>
                 </div>
                 <div className='rival_deck_2'>
-                    <img src={deck_7} className='rival_cards'/>  
+                    <img src={deck_4} className='rival_cards'/>  
+                    <h2>Rival 2</h2>
                 </div>
                 <div className='rival_deck_3'>
-                    <img src={deck_7} className='rival_cards'/>  
+                    <img src={deck_5} className='rival_cards'/>
+                    <h2>Rival 3</h2>
                 </div>
                 <div className='rival_deck_4'>
-                    <img src={deck_7} className='rival_cards'/>  
+                    <img src={deck_7plus} className='rival_cards'/>
+                    <h2>Rival 4</h2>
                 </div>
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className='droppables'>

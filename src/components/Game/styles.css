@@ -35,25 +35,28 @@
 
 .rival_deck_1, .rival_deck_2, .rival_deck_3, .rival_deck_4  {
     position: absolute;
-    display: inline;
+    color:  #ffffff;
 }
 
 .rival_deck_1 {
-    margin-top: 20%;
+    margin-top: 23%;
     margin-left: 10%;
-    /* transform: rotate(90deg) */
 }
 
 .rival_deck_2 {
     margin-top: 2%;
-    margin-left: 35%;
-    /* transform: rotate(180deg) */
+    margin-left: 25%;
 }
 
 .rival_deck_3 {
-    margin-top: 13%;
+    margin-top: 2%;
+    margin-left: 55%;
+}
+
+.rival_deck_4 {
+    margin-top: 11%;
+    margin-right: 10%;
     right: 0;
-    /* transform: rotate(-130deg) */
 }
 
 .rival_cards {
