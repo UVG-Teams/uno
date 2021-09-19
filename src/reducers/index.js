@@ -14,3 +14,4 @@ export const getGameInfo = state => gameSelectors.getGameInfo(state.game);
 export const getCurrentUserInfo = state => gameSelectors.getCurrentUserInfo(state.game);
 export const getSocket = state => socketSelectors.getSocket(state.socket);
 export const getMessages = state => chatSelectors.getMessages(state.chat);
+export const getCurrentPlayedCard = state => gameSelectors.getCurrentPlayedCard(state.game);

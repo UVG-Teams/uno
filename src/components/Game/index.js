@@ -1,5 +1,5 @@
 import React , { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { TextField, Button } from '@material-ui/core';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
@@ -52,7 +52,7 @@ const getListStyle = isDraggingOver => ({
 });
 
 
-const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, currentPlayedCard, receiveChatMessage, receiveCardMovement }) => {
+const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, currentPlayedCard, moveCard, receiveChatMessage, receiveCardMovement }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
         if (!socket || socket.readyState == WebSocket.CLOSED) {
@@ -61,7 +61,6 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, curr
     }, []);
 
     const [myDeck, setMyDeck] = useState(myCards);
-    const [playedDeck, setPlayedDeck] = useState([currentPlayedCard]);
 
     if (!gameInfo) {
         return <Redirect to='/' />
@@ -102,7 +101,7 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, curr
         playedDeck: 'playedDeck'
     };
 
-    const getList = id => id2List[id] == 'myDeck' ? myDeck : playedDeck;
+    const getList = id => id2List[id] == 'myDeck' ? myDeck : currentPlayedCard;
 
     const onDragEnd = result => {
         const { source, destination } = result;
@@ -132,12 +131,13 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, curr
                 JSON.stringify({
                     type: 'game_move',
                     sent_by: currentUser.username,
-                    moved_card: moved_card.id,
+                    moved_card: moved_card,
                     sent_at: Date.now(),
+                    moved_to: 'currentPlayedCard'
                 })
             );
 
-            setPlayedDeck(result.playedDeck);
+            moveCard(currentUser.username, moved_card, 'currentPlayedCard')
             setMyDeck(result.myDeck);
         };
     };
@@ -206,7 +206,7 @@ const Game = ({ currentUser, gameInfo, socket, connectWS, endgame, myCards, curr
                                     <div
                                         ref={provided.innerRef}
                                         style={getListStyle(snapshot.isDraggingOver)}>
-                                        {playedDeck.map((item, index) => (
+                                        {currentPlayedCard.map((item, index) => (
                                             <Draggable
                                                 key={item.id}
                                                 draggableId={item.id}
@@ -243,7 +243,7 @@ export default connect(
         currentUser: selectors.getCurrentUserInfo(state),
         gameInfo: selectors.getGameInfo(state),
         socket: selectors.getSocket(state),
-        currentPlayedCard: { id: 'green_8', content: 'green_8' },
+        currentPlayedCard: selectors.getCurrentPlayedCard(state) ? [selectors.getCurrentPlayedCard(state)] : [{ id: 'green_8', content: 'green_8' }],
         myCards: [{
             id: 'blue_1',
             content: 'blue_1'
@@ -285,8 +285,19 @@ export default connect(
                 ...messageData,
             }));
         },
+        moveCard(moved_by, moved_card, moved_to) {
+            dispatch(gameState.actions.moveCard({
+                moved_by: moved_by,
+                moved_card: moved_card,
+                moved_to: moved_to,
+            }))
+        },
         receiveCardMovement(messageData) {
-            // dispatch()
+            dispatch(gameState.actions.moveCard({
+                moved_by: messageData.sent_by,
+                moved_card: messageData.moved_card,
+                moved_to: messageData.moved_to,
+            }))
         }
     })
 )(Game);
