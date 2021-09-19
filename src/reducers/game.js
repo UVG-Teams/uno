@@ -7,6 +7,7 @@ export const types = {
     CLOSE_GAME: 'CLOSE_GAME',
     CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
     CARD_MOVED: 'CARD_MOVED',
+    NEW_USER_RECEIVED: 'NEW_USER_RECEIVED',
     // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
     // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
     // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
@@ -35,6 +36,10 @@ export const actions = {
     moveCard: movement => ({
         type: types.CARD_MOVED,
         payload: movement
+    }),
+    receiveNewUser: data => ({
+        type: types.NEW_USER_RECEIVED,
+        payload: data
     }),
     // startJoiningGame: () => ({
     //     type: types.JOIN_GAME_STARTED,
@@ -89,20 +94,17 @@ const currentUserInfo = (state = null, action) => {
     };
 };
 
-const players = (state = [{
-    username: "Luca",
-    cards: 0,
-},{
-    username: "Marco",
-    cards: 6,
-},{
-    username: "Andy",
-    cards: 21,
-},{
-    username: "Block",
-    cards: 8,
-}], action) => {
+const players = (state = [], action) => {
     switch(action.type) {
+        case types.NEW_USER_RECEIVED: {
+            return [
+                ...state,
+                {
+                    username: action.payload.username,
+                    cards: 0,
+                }
+            ];
+        };
         default: return state;
     };
 };
