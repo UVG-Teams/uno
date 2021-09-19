@@ -65,6 +65,7 @@ const Game = ({
     receiveChatMessage,
     receiveCardMovement,
     receiveNewUser,
+    removePlayer,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -105,8 +106,19 @@ const Game = ({
                     break;
                 };
                 case 'sign_in': {
+                    // TODO: validar que no haya un user con ese nombre
                     receiveChatMessage(messageData);
                     receiveNewUser(messageData);
+                    break;
+                };
+                case 'leave_game': {
+                    receiveChatMessage({
+                        type: 'text',
+                        sent_by: messageData.sent_by,
+                        text: 'Adios',
+                        sent_at: messageData.sent_at,
+                    });
+                    removePlayer(messageData);
                     break;
                 };
                 default: receiveChatMessage(messageData);
@@ -306,6 +318,9 @@ export default connect(
             dispatch(gameState.actions.receiveNewUser({
                 username: messageData.sent_by,
             }))
+        },
+        removePlayer(messageData) {
+            dispatch(gameState.actions.removePlayer(messageData.sent_by));
         }
     })
 )(Game);

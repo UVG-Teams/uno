@@ -11,7 +11,6 @@ function* leaveGame(action) {
 
     const currentUser = yield select(selectors.getCurrentUserInfo);
     const socket = yield select(selectors.getSocket);
-    console.log("AVER", socket, currentUser)
 
     if (socket || currentUser) {
         socket.send(
