@@ -109,12 +109,13 @@ const Game = ({
                     receiveNewUser(messageData);
                     break;
                 };
+                default: receiveChatMessage(messageData);
             }
         };
 
         // Listen for socket closes
-        socket.onclose = () => endgame(socket);
-        socket.onerror = () => endgame(socket);
+        socket.onclose = () => endgame();
+        socket.onerror = () => endgame();
     };
 
     // Handle with multiple lists matching ids of the droppable container to the names in state.
@@ -166,7 +167,7 @@ const Game = ({
     return (
         <div className='game_page'>
             <div style={{position: 'absolute'}}>
-                <Button onClick={() => endgame(socket)} variant='contained' color='primary'>
+                <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close
                 </Button>
             </div>
@@ -278,9 +279,8 @@ export default connect(
                 url: 'ws://localhost:8080'
             }));
         },
-        endgame(socket) {
-            socket.close();
-            dispatch(gameState.actions.closeGame());
+        endgame() {
+            dispatch(gameState.actions.startClosingGame());
         },
         receiveChatMessage(messageData) {
             dispatch(chatState.actions.receiveMessage({

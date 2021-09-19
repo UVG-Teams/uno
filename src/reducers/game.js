@@ -4,7 +4,8 @@ export const types = {
     CREATE_GAME_STARTED: 'CREATE_GAME_STARTED',
     CREATE_GAME_COMPLETED: 'CREATE_GAME_COMPLETED',
     CREATE_GAME_FAILED: 'CREATE_GAME_FAILED',
-    CLOSE_GAME: 'CLOSE_GAME',
+    CLOSE_GAME_STARTED: 'CLOSE_GAME_STARTED',
+    CLOSE_GAME_COMPLETED: 'CLOSE_GAME_COMPLETED',
     CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
     CARD_MOVED: 'CARD_MOVED',
     NEW_USER_RECEIVED: 'NEW_USER_RECEIVED',
@@ -26,8 +27,11 @@ export const actions = {
         type: types.CREATE_GAME_FAILED,
         payload: { error }
     }),
-    closeGame: () => ({
-        type: types.CLOSE_GAME
+    startClosingGame: () => ({
+        type: types.CLOSE_GAME_STARTED,
+    }),
+    completeClosingGame: () => ({
+        type: types.CLOSE_GAME_COMPLETED,
     }),
     setCurrentUserInfo: userInfo => ({
         type: types.CURRENT_USER_INFO_SETTED,
@@ -66,7 +70,7 @@ const gameInfo = (state = null, action) => {
         case types.CREATE_GAME_FAILED: {
             return null;
         };
-        case types.CLOSE_GAME: {
+        case types.CLOSE_GAME_COMPLETED: {
             return null;
         };
         // case types.JOIN_GAME_STARTED: {
@@ -87,7 +91,7 @@ const currentUserInfo = (state = null, action) => {
         case types.CURRENT_USER_INFO_SETTED: {
             return action.payload;
         };
-        case types.CLOSE_GAME: {
+        case types.CLOSE_GAME_COMPLETED: {
             return null;
         };
         default: return state;
@@ -104,6 +108,9 @@ const players = (state = [], action) => {
                     cards: 0,
                 }
             ];
+        };
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
         };
         default: return state;
     };
@@ -133,7 +140,10 @@ const myCards = (state = [{
                 return new_state;
             }
             return state;
-        }
+        };
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
         default: return state;
     };
 };
@@ -145,13 +155,19 @@ const currentPlayedCard = (state = null, action) => {
                 return action.payload.moved_card;
             }
             return state;
-        }
+        };
+        case types.CLOSE_GAME_COMPLETED: {
+            return null;
+        };
         default: return state;
     };
 };
 
 const deck = (state = [], action) => {
     switch(action.type) {
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
         default: return state;
     };
 };

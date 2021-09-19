@@ -27,7 +27,7 @@ const messages = (state = [], action) => {
         case types.MESSAGE_RECEIVED: {
             return [ ...state, action.payload ];
         };
-        case gameState.types.CLOSE_GAME: {
+        case gameState.types.CLOSE_GAME_COMPLETED: {
             return [];
         };
         default: return state;
