@@ -95,8 +95,31 @@ const players = (state = [], action) => {
     };
 };
 
-const myCards = (state = [], action) => {
+const myCards = (state = [{
+    id: 'blue_1',
+    content: 'blue_1'
+}, {
+    id: 'blue_2',
+    content: 'blue_2'
+}, {
+    id: 'green_3',
+    content: 'green_3'
+}], action) => {
     switch(action.type) {
+        case types.CARD_MOVED: {
+            if (action.payload.moved_by_me) {
+                const new_state = [];
+
+                state.map(card => {
+                    if (card.id != action.payload.moved_card.id) {
+                        new_state.push(card);
+                    };
+                });
+
+                return new_state;
+            }
+            return state;
+        }
         default: return state;
     };
 };
@@ -131,3 +154,4 @@ export default combineReducers({
 export const getGameInfo = state => state.gameInfo;
 export const getCurrentUserInfo = state => state.currentUserInfo;
 export const getCurrentPlayedCard = state => state.currentPlayedCard;
+export const getMyCards = state => state.myCards;
