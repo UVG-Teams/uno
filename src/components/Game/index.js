@@ -93,7 +93,7 @@ const Game = ({
                 })
             );
         };
-
+        
         // Listen for messages
         socket.onmessage = function(event) {
             const messageData = JSON.parse(event.data);
@@ -142,8 +142,10 @@ const Game = ({
     const getList = id => id2List[id] == 'myDeck' ? myCards : currentPlayedCard;
 
     const onDragEnd = result => {
+        const current_card_color = currentPlayedCard[0].content.split("_")[0];
+        const current_card_number = currentPlayedCard[0].content.split("_")[1];
         const { source, destination } = result;
-
+        
         // Dropped outside the list, then return card to origin
         if (!destination) {
             return;
@@ -163,8 +165,13 @@ const Game = ({
                 getList(destination.droppableId),
                 source,
                 destination
-            );
-
+                );
+            const moved_card_color = moved_card.content.split("_")[0]
+            const moved_card_number = moved_card.content.split("_")[1]
+            if((current_card_color !== moved_card_color) & (current_card_number !== moved_card_number)){
+                return;
+            }
+                
             socket.send(
                 JSON.stringify({
                     type: 'game_move',
@@ -174,7 +181,6 @@ const Game = ({
                     moved_to: 'currentPlayedCard',
                 })
             );
-
             moveMyCard(currentUser.username, moved_card, 'currentPlayedCard')
         };
     };
