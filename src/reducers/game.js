@@ -215,6 +215,9 @@ const currentPlayedCard = (state = null, action) => {
 
 const deck = (state = [], action) => {
     switch(action.type) {
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
         case types.CREATE_GAME_STARTED: {
             const cards_numbers = COLORS.map(
                 color => NUMBERS.map(

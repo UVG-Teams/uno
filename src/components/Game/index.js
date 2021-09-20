@@ -68,7 +68,6 @@ const Game = ({
     receiveNewUser,
     removePlayer,
     takeCard,
-    deck,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -172,17 +171,16 @@ const Game = ({
                     moved_card: moved_card,
                     sent_at: Date.now(),
                     moved_to: 'currentPlayedCard',
-                    deck,
                 })
             );
 
-            moveMyCard(currentUser.username, moved_card, 'currentPlayedCard', deck)
+            moveMyCard(currentUser.username, moved_card, 'currentPlayedCard')
         };
     };
 
     return (
         <div className='game_page'>
-            <div style={{position: 'absolute'}}>
+            <div style={{ position: 'absolute' }}>
                 <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close
                 </Button>
@@ -227,10 +225,7 @@ const Game = ({
                                                             ref={ provided.innerRef }
                                                             { ...provided.draggableProps }
                                                             { ...provided.dragHandleProps }
-                                                            style={getItemStyle(
-                                                                snapshot.isDragging,
-                                                                provided.draggableProps.style
-                                                            )}>
+                                                            style={ getItemStyle(snapshot.isDragging, provided.draggableProps.style) }>
                                                             <img src={ `/images/${item.content}.png` } className='game_cards' />
                                                         </div>
                                                     )}
@@ -243,7 +238,7 @@ const Game = ({
                             </Droppable>
                         </div>
                         <div className='table_deck_droppable'>
-                            <Button onClick={ () => takeCard() }>
+                            <Button onClick={() => takeCard()}>
                                 <img src={ deck_1 } className='take_card'/>
                             </Button>
                             <Droppable droppableId='playedDeck'>
@@ -262,8 +257,8 @@ const Game = ({
                                                             ref={ provided.innerRef }
                                                             { ...provided.draggableProps }
                                                             { ...provided.dragHandleProps }
-                                                            style={ getItemStyle( snapshot.isDragging, provided.draggableProps.style) }>
-                                                            <img src={ `/images/${item.content}.png` } className='main_game_card'/>
+                                                            style={ getItemStyle(snapshot.isDragging, provided.draggableProps.style) }>
+                                                            <img src={ `/images/${item.content}.png` } className='main_game_card' />
                                                         </div>
                                                     )}
                                                 </Draggable>
@@ -306,40 +301,39 @@ export default connect(
                 ...messageData,
             }));
         },
-        moveMyCard(moved_by, moved_card, moved_to, deck) {
+        moveMyCard(moved_by, moved_card, moved_to) {
             dispatch(gameState.actions.moveCard({
                 moved_by: moved_by,
                 moved_card: moved_card,
                 moved_to: moved_to,
-                moved_by_me: true,
-                deck,
-            }))
+                moved_by_me: true
+            }));
         },
         receiveCardMovement(messageData) {
             dispatch(gameState.actions.moveCard({
                 moved_by: messageData.sent_by,
                 moved_card: messageData.moved_card,
                 moved_to: messageData.moved_to,
-            }))
+            }));
         },
         receiveNewUser(messageData) {
             dispatch(gameState.actions.receiveNewUser({
                 username: messageData.sent_by,
-            }))
+            }));
         },
         removePlayer(messageData) {
             dispatch(gameState.actions.removePlayer(messageData.sent_by));
         },
         takeCard(currentUser) {
             // TODO: take random select and remove it from deck
-            const randomCard = { id: 'red_3', content: 'red_3' }
+            const randomCard = { id: 'red_3', content: 'red_3' };
 
             dispatch(gameState.actions.moveCard({
                 moved_by: currentUser.username,
                 moved_card: randomCard,
                 moved_to: currentUser.username,
                 moved_by_me: true
-            }))
+            }));
         }
     }),
     (stateProps, dispatchProps, ownProps) => ({
@@ -348,6 +342,6 @@ export default connect(
         ...dispatchProps,
         takeCard() {
             dispatchProps.takeCard(stateProps.currentUser);
-        }
+        },
     })
 )(Game);
