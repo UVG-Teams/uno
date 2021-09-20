@@ -63,9 +63,9 @@ const Login = ({ gameInfo, createGame, endgame }) => {
 
                 <div className='login_img_container'>
                     <div className='login_img_container2'>
-                        <img src={ backCard } className='login_img' />
-                        <img src={ backCard } className='login_img2' />
-                        <img src={ backCard } className='login_img3' />
+                        <img src={ backCard } className='login_img' alt=''/>
+                        <img src={ backCard } className='login_img2' alt=''/>
+                        <img src={ backCard } className='login_img3' alt=''/>
                     </div>
                 </div>
 
@@ -82,13 +82,14 @@ export default connect(
     dispatch => ({
         createGame(username, roomCode, password) {
 
+            // eslint-disable-next-line eqeqeq
             if (!username || username == "") {
                 return
             }
 
             const gameData = {
-                roomCode: "4F",
-                password: "12345",
+                roomCode,
+                password,
                 roomOwner: username
             };
 

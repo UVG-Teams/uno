@@ -1,5 +1,8 @@
 import { combineReducers } from 'redux';
 
+const COLORS = ['blue', 'green', 'red', 'yellow'];
+const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+
 export const types = {
     CREATE_GAME_STARTED: 'CREATE_GAME_STARTED',
     CREATE_GAME_COMPLETED: 'CREATE_GAME_COMPLETED',
@@ -215,6 +218,61 @@ const deck = (state = [], action) => {
         case types.CLOSE_GAME_COMPLETED: {
             return [];
         };
+        case types.CREATE_GAME_STARTED: {
+            const cards_numbers = COLORS.map(
+                color => NUMBERS.map(
+                    number => number !== 0 ? [
+                        ...Array(2).fill({
+                        id: `${color}_${number}`,
+                        content: `${color}_${number}`,
+                        })
+                    ] : [
+                        {
+                            id: `${color}_${number}`,
+                            content: `${color}_${number}`,
+                        },
+                    ]
+                )
+            );
+            const action_cards = COLORS.map(
+                color => [
+                    ...Array(2).fill(
+                        {
+                            id: `${color}_draw`,
+                            content: `${color}_draw`,
+                        },
+                    ),
+                    ...Array(2).fill(
+                        {
+                            id: `${color}_reverse`,
+                            content: `${color}_reverse`,
+                        },
+                    ),
+                    ...Array(2).fill(
+                        {
+                            id: `${color}_skip`,
+                            content: `${color}_skip`,
+                        },
+                    ),
+                ]
+            )
+
+            const wild_cards = COLORS.map(
+                color => [
+                    {
+                        id: `wild_color`,
+                        content: `wild_color`,
+                    },
+                    {
+                        id: `wild_draw`,
+                        content: `wild_draw`,
+                    }
+                ]
+            )
+            const returnedValue = [...cards_numbers, ...action_cards ,...wild_cards].map(value => value.flat()).flat().sort(() => Math.random() - 0.5);
+            console.log(returnedValue);
+            return returnedValue;
+        };
         default: return state;
     };
 };
@@ -233,3 +291,4 @@ export const getCurrentUserInfo = state => state.currentUserInfo;
 export const getCurrentPlayedCard = state => state.currentPlayedCard;
 export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
+export const getDeck = state => state.deck;
