@@ -17,3 +17,4 @@ export const getMessages = state => chatSelectors.getMessages(state.chat);
 export const getCurrentPlayedCard = state => gameSelectors.getCurrentPlayedCard(state.game);
 export const getMyCards = state => gameSelectors.getMyCards(state.game);
 export const getPlayers = state => gameSelectors.getPlayers(state.game);
+export const getGameDeck = state => gameSelectors.getDeck(state.game);

@@ -68,6 +68,7 @@ const Game = ({
     receiveNewUser,
     removePlayer,
     takeCard,
+    deck,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -170,11 +171,12 @@ const Game = ({
                     sent_by: currentUser.username,
                     moved_card: moved_card,
                     sent_at: Date.now(),
-                    moved_to: 'currentPlayedCard'
+                    moved_to: 'currentPlayedCard',
+                    deck,
                 })
             );
 
-            moveMyCard(currentUser.username, moved_card, 'currentPlayedCard')
+            moveMyCard(currentUser.username, moved_card, 'currentPlayedCard', deck)
         };
     };
 
@@ -288,6 +290,7 @@ export default connect(
         currentPlayedCard: selectors.getCurrentPlayedCard(state) ? [selectors.getCurrentPlayedCard(state)] : [{ id: 'green_8', content: 'green_8' }],
         myCards: selectors.getMyCards(state),
         players: selectors.getPlayers(state),
+        deck: selectors.getGameDeck(state),
     }),
     dispatch => ({
         connectWS() {
@@ -303,13 +306,13 @@ export default connect(
                 ...messageData,
             }));
         },
-        moveMyCard(moved_by, moved_card, moved_to) {
-            console.log(moved_by, moved_card, moved_to);
+        moveMyCard(moved_by, moved_card, moved_to, deck) {
             dispatch(gameState.actions.moveCard({
                 moved_by: moved_by,
                 moved_card: moved_card,
                 moved_to: moved_to,
-                moved_by_me: true
+                moved_by_me: true,
+                deck,
             }))
         },
         receiveCardMovement(messageData) {

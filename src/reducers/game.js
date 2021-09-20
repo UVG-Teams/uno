@@ -288,3 +288,4 @@ export const getCurrentUserInfo = state => state.currentUserInfo;
 export const getCurrentPlayedCard = state => state.currentPlayedCard;
 export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
+export const getDeck = state => state.deck;
