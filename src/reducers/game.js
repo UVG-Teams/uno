@@ -127,7 +127,19 @@ const players = (state = [], action) => {
             });
 
             return newState;
-        }
+        };
+        // if (action.payload.moved_by_me) {
+        //     const newState = [];
+
+        //     state.map(card => {
+        //         if (card.id != action.payload.moved_card.id) {
+        //             newState.push(card);
+        //         };
+        //     });
+
+        //     return newState;
+        // }
+        // return state;
         default: return state;
     };
 };
@@ -157,9 +169,9 @@ const myCards = (state = [{
             }
             return state;
         };
-        case types.CLOSE_GAME_COMPLETED: {
-            return [];
-        };
+        // case types.CLOSE_GAME_COMPLETED: {
+        //     return [];
+        // };
         default: return state;
     };
 };
