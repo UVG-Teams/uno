@@ -68,6 +68,7 @@ const Game = ({
     receiveNewUser,
     removePlayer,
     takeCard,
+    deck,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -238,9 +239,13 @@ const Game = ({
                             </Droppable>
                         </div>
                         <div className='table_deck_droppable'>
-                            <Button onClick={() => takeCard()}>
-                                <img src={ deck_1 } className='take_card'/>
-                            </Button>
+                            {
+                                deck.length > 0 ? (
+                                    <Button onClick={() => takeCard()}>
+                                        <img src={ deck_1 } className='take_card'/>
+                                    </Button>
+                                ) : (<></>)
+                            }
                             <Droppable droppableId='playedDeck'>
                                 {(provided, snapshot) => (
                                     <div
@@ -324,9 +329,8 @@ export default connect(
         removePlayer(messageData) {
             dispatch(gameState.actions.removePlayer(messageData.sent_by));
         },
-        takeCard(currentUser) {
-            // TODO: take random select and remove it from deck
-            const randomCard = { id: 'red_3', content: 'red_3' };
+        takeCard(currentUser, deck) {
+            const randomCard = deck.pop();
 
             dispatch(gameState.actions.moveCard({
                 moved_by: currentUser.username,
@@ -341,7 +345,7 @@ export default connect(
         ...stateProps,
         ...dispatchProps,
         takeCard() {
-            dispatchProps.takeCard(stateProps.currentUser);
+            dispatchProps.takeCard(stateProps.currentUser, stateProps.deck);
         },
     })
 )(Game);

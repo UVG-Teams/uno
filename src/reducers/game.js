@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { v4 as uuidv4 } from 'uuid';
 
 const COLORS = ['blue', 'green', 'red', 'yellow'];
 const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
@@ -160,13 +161,13 @@ const players = (state = [], action) => {
 };
 
 const myCards = (state = [{
-    id: 'blue_1',
+    id: uuidv4(),
     content: 'blue_1'
 }, {
-    id: 'blue_2',
+    id: uuidv4(),
     content: 'blue_2'
 }, {
-    id: 'green_3',
+    id: uuidv4(),
     content: 'green_3'
 }], action) => {
     switch(action.type) {
@@ -218,60 +219,54 @@ const deck = (state = [], action) => {
         case types.CLOSE_GAME_COMPLETED: {
             return [];
         };
+        case types.CARD_MOVED: {
+            if (action.payload.moved_to != 'currentPlayedCard') {
+                const newState = [];
+
+                state.map(card => {
+                    if (card.id != action.payload.moved_card.id) {
+                        newState.push(card);
+                    };
+                });
+
+                return newState;
+            };
+
+            return state;
+        };
         case types.CREATE_GAME_STARTED: {
             const cards_numbers = COLORS.map(
                 color => NUMBERS.map(
                     number => number !== 0 ? [
-                        ...Array(2).fill({
-                        id: `${color}_${number}`,
-                        content: `${color}_${number}`,
-                        })
+                        ...Array(2).fill({ content: `${color}_${number}` })
                     ] : [
-                        {
-                            id: `${color}_${number}`,
-                            content: `${color}_${number}`,
-                        },
+                        { content: `${color}_${number}` },
                     ]
                 )
             );
+
             const action_cards = COLORS.map(
                 color => [
-                    ...Array(2).fill(
-                        {
-                            id: `${color}_draw`,
-                            content: `${color}_draw`,
-                        },
-                    ),
-                    ...Array(2).fill(
-                        {
-                            id: `${color}_reverse`,
-                            content: `${color}_reverse`,
-                        },
-                    ),
-                    ...Array(2).fill(
-                        {
-                            id: `${color}_skip`,
-                            content: `${color}_skip`,
-                        },
-                    ),
+                    ...Array(2).fill({ content: `${color}_draw` }),
+                    ...Array(2).fill({ content: `${color}_reverse` }),
+                    ...Array(2).fill({ content: `${color}_skip` }),
                 ]
-            )
+            );
 
             const wild_cards = COLORS.map(
                 color => [
-                    {
-                        id: `wild_color`,
-                        content: `wild_color`,
-                    },
-                    {
-                        id: `wild_draw`,
-                        content: `wild_draw`,
-                    }
+                    { content: `wild_color` },
+                    { content: `wild_draw` }
                 ]
-            )
-            const returnedValue = [...cards_numbers, ...action_cards ,...wild_cards].map(value => value.flat()).flat().sort(() => Math.random() - 0.5);
-            console.log(returnedValue);
-            return returnedValue;
+            );
+
+            const returnedValue = [...cards_numbers, ...action_cards, ...wild_cards].map(value => value.flat()).flat().sort(() => Math.random() - 0.5);
+            return returnedValue.map(card => {
+                return {
+                    ...card,
+                    id: uuidv4()
+                }
+            })
         };
         default: return state;
     };
