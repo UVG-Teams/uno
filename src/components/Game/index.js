@@ -69,6 +69,11 @@ const Game = ({
     removePlayer,
     takeCard,
     deck,
+    sendNewUserCurrentGameState,
+    setInitialDeck,
+    setInitialPlayedCard,
+    setOnlinePlayers,
+    setGameInfo,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -97,8 +102,6 @@ const Game = ({
         // Listen for messages
         socket.onmessage = function(event) {
             const messageData = JSON.parse(event.data);
-            // TODO: validar si es mensaje de chat o de jugada de uno
-            console.log("New message", messageData);
             switch(messageData.type) {
                 case 'text': {
                     receiveChatMessage(messageData);
@@ -112,6 +115,11 @@ const Game = ({
                     // TODO: validar que no haya un user con ese nombre
                     receiveChatMessage(messageData);
                     receiveNewUser(messageData);
+
+                    if (currentUser.username == gameInfo.roomOwner) {
+                        sendNewUserCurrentGameState(messageData);
+                    }
+
                     break;
                 };
                 case 'leave_game': {
@@ -124,7 +132,22 @@ const Game = ({
                     removePlayer(messageData);
                     break;
                 };
-                default: receiveChatMessage(messageData);
+                case 'welcome': {
+                    if (messageData.sent_to == currentUser.username) {
+                        receiveChatMessage({
+                            type: 'text',
+                            sent_by: messageData.sent_by,
+                            text: messageData.text,
+                            sent_at: messageData.sent_at,
+                        });
+                        setInitialDeck(messageData);
+                        setInitialPlayedCard(messageData);
+                        setOnlinePlayers(messageData);
+                        setGameInfo(messageData);
+                    };
+                    break;
+                };
+                default: console.log(messageData);
             }
         };
 
@@ -188,7 +211,9 @@ const Game = ({
             </div>
             <div className='dnd'>
                 {
-                    players.map((player, index) => {
+                    players.filter(player => player.username != currentUser.username)
+                    .map((player, index) => {
+
                         let deck_amount;
 
                         if (player.cards <= 0) {
@@ -348,7 +373,34 @@ export default connect(
                 moved_to: currentUser.username,
                 moved_by_me: true
             }));
-        }
+        },
+        sendNewUserCurrentGameState(currentUser, socket, gameInfo, currentPlayedCard, players, deck, new_username) {
+            socket.send(
+                JSON.stringify({
+                    type: 'welcome',
+                    sent_by: currentUser.username,
+                    game_info: gameInfo,
+                    current_played_card: currentPlayedCard,
+                    players: players,
+                    deck: deck,
+                    sent_to: new_username,
+                    text: `Bienvenido ${new_username}`,
+                    sent_at: Date.now(),
+                })
+            )
+        },
+        setInitialDeck(messageData) {
+            dispatch(gameState.actions.setInitialDeck(messageData.deck));
+        },
+        setInitialPlayedCard(messageData) {
+            dispatch(gameState.actions.setInitialPlayedCard(messageData.current_played_card[0]));
+        },
+        setOnlinePlayers(messageData) {
+            dispatch(gameState.actions.setOnlinePlayers(messageData.players));
+        },
+        setGameInfo(messageData) {
+            dispatch(gameState.actions.setGameInfo(messageData.game_info));
+        },
     }),
     (stateProps, dispatchProps, ownProps) => ({
         ...ownProps,
@@ -357,5 +409,16 @@ export default connect(
         takeCard() {
             dispatchProps.takeCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
         },
+        sendNewUserCurrentGameState(messageData) {
+            dispatchProps.sendNewUserCurrentGameState(
+                stateProps.currentUser,
+                stateProps.socket,
+                stateProps.gameInfo,
+                stateProps.currentPlayedCard,
+                stateProps.players,
+                stateProps.deck,
+                messageData.sent_by,
+            );
+        }
     })
 )(Game);
