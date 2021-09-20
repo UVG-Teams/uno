@@ -12,7 +12,7 @@ function* leaveGame(action) {
     const currentUser = yield select(selectors.getCurrentUserInfo);
     const socket = yield select(selectors.getSocket);
 
-    if (socket || currentUser) {
+    if (socket && currentUser) {
         socket.send(
             JSON.stringify({
                 type: 'leave_game',

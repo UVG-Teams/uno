@@ -74,6 +74,7 @@ const Game = ({
     setInitialPlayedCard,
     setOnlinePlayers,
     setGameInfo,
+    setRandomInitialCard,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -97,6 +98,10 @@ const Game = ({
                     sent_at: Date.now(),
                 })
             );
+
+            if (currentUser.username == gameInfo.roomOwner) {
+                setRandomInitialCard();
+            }
         };
 
         // Listen for messages
@@ -312,7 +317,7 @@ export default connect(
         currentUser: selectors.getCurrentUserInfo(state),
         gameInfo: selectors.getGameInfo(state),
         socket: selectors.getSocket(state),
-        currentPlayedCard: selectors.getCurrentPlayedCard(state) ? [selectors.getCurrentPlayedCard(state)] : [{ id: 'green_8', content: 'green_8' }],
+        currentPlayedCard: selectors.getCurrentPlayedCard(state) ? [selectors.getCurrentPlayedCard(state)] : [],
         myCards: selectors.getMyCards(state),
         players: selectors.getPlayers(state),
         deck: selectors.getGameDeck(state),
@@ -401,6 +406,14 @@ export default connect(
         setGameInfo(messageData) {
             dispatch(gameState.actions.setGameInfo(messageData.game_info));
         },
+        setRandomInitialCard(currentUser, deck, socket) {
+            const randomCard = deck.pop();
+
+            dispatch(gameState.actions.moveInitialCard({
+                moved_by: currentUser.username,
+                moved_card: randomCard,
+            }));
+        }
     }),
     (stateProps, dispatchProps, ownProps) => ({
         ...ownProps,
@@ -419,6 +432,9 @@ export default connect(
                 stateProps.deck,
                 messageData.sent_by,
             );
+        },
+        setRandomInitialCard() {
+            dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
         }
     })
 )(Game);

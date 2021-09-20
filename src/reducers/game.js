@@ -12,6 +12,7 @@ export const types = {
     CLOSE_GAME_COMPLETED: 'CLOSE_GAME_COMPLETED',
     CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
     CARD_MOVED: 'CARD_MOVED',
+    INITIAL_CARD_MOVED: 'INITIAL_CARD_MOVED',
     NEW_USER_RECEIVED: 'NEW_USER_RECEIVED',
     PLAYER_REMOVED: 'PLAYER_REMOVED',
     INITIAL_DECK_RECEIVED: 'INITIAL_DECK_RECEIVED',
@@ -48,6 +49,10 @@ export const actions = {
     }),
     moveCard: movement => ({
         type: types.CARD_MOVED,
+        payload: movement
+    }),
+    moveInitialCard: movement => ({
+        type: types.INITIAL_CARD_MOVED,
         payload: movement
     }),
     receiveNewUser: data => ({
@@ -224,6 +229,9 @@ const myCards = (state = [], action) => {
 
 const currentPlayedCard = (state = null, action) => {
     switch(action.type) {
+        case types.INITIAL_CARD_MOVED: {
+            return action.payload.moved_card;
+        };
         case types.INITIAL_PLAYED_CARD_RECEIVED: {
             return action.payload;
         };
@@ -247,6 +255,17 @@ const deck = (state = [], action) => {
         };
         case types.CLOSE_GAME_COMPLETED: {
             return [];
+        };
+        case types.INITIAL_CARD_MOVED: {
+            const newState = [];
+
+            state.map(card => {
+                if (card.id != action.payload.moved_card.id) {
+                    newState.push(card);
+                };
+            });
+
+            return newState;
         };
         case types.CARD_MOVED: {
             if (action.payload.moved_to != 'currentPlayedCard') {
