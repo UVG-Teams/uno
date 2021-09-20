@@ -14,6 +14,10 @@ export const types = {
     CARD_MOVED: 'CARD_MOVED',
     NEW_USER_RECEIVED: 'NEW_USER_RECEIVED',
     PLAYER_REMOVED: 'PLAYER_REMOVED',
+    INITIAL_DECK_RECEIVED: 'INITIAL_DECK_RECEIVED',
+    INITIAL_PLAYED_CARD_RECEIVED: 'INITIAL_PLAYED_CARD_RECEIVED',
+    ONLINE_PLAYERS_RECEIVED: 'ONLINE_PLAYERS_RECEIVED',
+    GAME_INFO_RECEIVED: 'GAME_INFO_RECEIVED',
     // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
     // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
     // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
@@ -53,7 +57,23 @@ export const actions = {
     removePlayer: username => ({
         type: types.PLAYER_REMOVED,
         payload: username
-    })
+    }),
+    setInitialDeck: deck => ({
+        type: types.INITIAL_DECK_RECEIVED,
+        payload: deck
+    }),
+    setInitialPlayedCard: playedCard => ({
+        type: types.INITIAL_PLAYED_CARD_RECEIVED,
+        payload: playedCard
+    }),
+    setOnlinePlayers: players => ({
+        type: types.ONLINE_PLAYERS_RECEIVED,
+        payload: players
+    }),
+    setGameInfo: gameInfo => ({
+        type: types.GAME_INFO_RECEIVED,
+        payload: gameInfo
+    }),
     // startJoiningGame: () => ({
     //     type: types.JOIN_GAME_STARTED,
     //     payload: null
@@ -70,6 +90,9 @@ export const actions = {
 
 const gameInfo = (state = null, action) => {
     switch(action.type) {
+        case types.GAME_INFO_RECEIVED: {
+            return action.payload;
+        };
         case types.CREATE_GAME_STARTED: {
             return action.payload;
         };
@@ -109,6 +132,15 @@ const currentUserInfo = (state = null, action) => {
 
 const players = (state = [], action) => {
     switch(action.type) {
+        case types.ONLINE_PLAYERS_RECEIVED: {
+            return action.payload;
+        };
+        case types.CREATE_GAME_STARTED: {
+            return [{
+                username: action.payload.roomOwner,
+                cards: 0,
+            }]
+        };
         case types.NEW_USER_RECEIVED: {
             return [
                 ...state,
@@ -192,6 +224,9 @@ const myCards = (state = [], action) => {
 
 const currentPlayedCard = (state = null, action) => {
     switch(action.type) {
+        case types.INITIAL_PLAYED_CARD_RECEIVED: {
+            return action.payload;
+        };
         case types.CARD_MOVED: {
             if (action.payload.moved_to == 'currentPlayedCard') {
                 return action.payload.moved_card;
@@ -207,6 +242,9 @@ const currentPlayedCard = (state = null, action) => {
 
 const deck = (state = [], action) => {
     switch(action.type) {
+        case types.INITIAL_DECK_RECEIVED: {
+            return action.payload;
+        };
         case types.CLOSE_GAME_COMPLETED: {
             return [];
         };
