@@ -1,0 +1,39 @@
+.uno-button-container {
+  position: absolute;
+  top: 2.5vw;
+  right: 2.5vw;
+  width: 20vw;
+  height: 20vw;
+
+  border-radius: 13vw;
+  /* background-color: #8C241B; */
+  background-color: #5fda96;
+  border: 1px solid black;
+  box-shadow: 0 0 10px black;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  transition: all 0.2s ease-in-out;
+}
+
+.uno-button-container h1{
+  transition: all 0.2s ease-in-out;
+
+  text-align: center;
+  font-size: 40px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  transform: scaleX(1);
+}
+
+.uno-button-container:hover {
+  cursor: pointer;
+  background-color: #6bf7aa;
+  box-shadow: 0 0 15px black;
+}
+
+.uno-button-container:hover h1 {
+  transform: scaleX(1.1);
+}

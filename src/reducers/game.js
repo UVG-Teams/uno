@@ -20,6 +20,10 @@ export const types = {
     GAME_INFO_RECEIVED: 'GAME_INFO_RECEIVED',
     NEW_COLOR_CHANGED: 'NEW_COLOR_CHANGED',
     NEW_COLOR_PLAYED: 'NEW_COLOR_PLAYED',
+    UNO_BUTTON_PRESSED: 'UNO_BUTTON_PRESSED',
+    // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
+    // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
+    // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
 };
 
 export const actions = {
@@ -77,6 +81,22 @@ export const actions = {
         type: types.NEW_COLOR_CHANGED,
         payload: color,
     }),
+    pressUno: payload => ({
+        type: types.UNO_BUTTON_PRESSED,
+        payload,
+    })
+    // startJoiningGame: () => ({
+    //     type: types.JOIN_GAME_STARTED,
+    //     payload: null
+    // }),
+    // completeJoiningGame: () => ({
+    //     type: types.JOIN_GAME_COMPLETED,
+    //     payload: null
+    // }),
+    // failJoiningGame: error => ({
+    //     type: types.JOIN_GAME_FAILED,
+    //     payload: { error }
+    // }),
 };
 
 const gameInfo = (state = null, action) => {

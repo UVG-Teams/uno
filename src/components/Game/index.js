@@ -20,6 +20,7 @@ import winnerGIF from '../Resources/winner.gif';
 
 import './styles.css';
 import Chat from '../Chat';
+import UnoButton from '../UnoButton';
 
 import * as selectors from '../../reducers';
 import * as gameState from '../../reducers/game';
@@ -329,11 +330,11 @@ const Game = ({
 
     return (
         <div className='game_page'>
-            <div className='room_name_background'>
+            {/* <div className='room_name_background'>
                 <h1>
                     {gameInfo.roomCode}
                 </h1>
-            </div>
+            </div> */}
             <div style={{position: 'absolute'}}>
                 <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close
@@ -432,6 +433,7 @@ const Game = ({
                     </div>
                 </DragDropContext>
                 <Chat/>
+                <UnoButton />
             </div>
             {/* Modal for change cards color */}
             <div>
