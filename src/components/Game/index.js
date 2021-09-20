@@ -191,7 +191,7 @@ const Game = ({
                     players.map((player, index) => {
                         let deck_amount;
 
-                        if (player.cards == 0) {
+                        if (player.cards <= 0) {
                             deck_amount = '1';
                         } else if (player.cards > 7) {
                             deck_amount = '7+';
@@ -204,7 +204,7 @@ const Game = ({
                                 <img src={`/images/deck_${deck_amount}.png`} className='rival_cards' />
                                 <h2>{ player.username }</h2>
                             </div>
-                        )
+                        );
                     })
                 }
                 <DragDropContext onDragEnd={ onDragEnd }>
@@ -329,8 +329,18 @@ export default connect(
         removePlayer(messageData) {
             dispatch(gameState.actions.removePlayer(messageData.sent_by));
         },
-        takeCard(currentUser, deck) {
+        takeCard(currentUser, deck, socket) {
             const randomCard = deck.pop();
+
+            socket.send(
+                JSON.stringify({
+                    type: 'game_move',
+                    sent_by: currentUser.username,
+                    moved_card: randomCard,
+                    sent_at: Date.now(),
+                    moved_to: currentUser.username,
+                })
+            );
 
             dispatch(gameState.actions.moveCard({
                 moved_by: currentUser.username,
@@ -345,7 +355,7 @@ export default connect(
         ...stateProps,
         ...dispatchProps,
         takeCard() {
-            dispatchProps.takeCard(stateProps.currentUser, stateProps.deck);
+            dispatchProps.takeCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
         },
     })
 )(Game);

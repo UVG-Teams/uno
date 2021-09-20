@@ -160,16 +160,7 @@ const players = (state = [], action) => {
     };
 };
 
-const myCards = (state = [{
-    id: uuidv4(),
-    content: 'blue_1'
-}, {
-    id: uuidv4(),
-    content: 'blue_2'
-}, {
-    id: uuidv4(),
-    content: 'green_3'
-}], action) => {
+const myCards = (state = [], action) => {
     switch(action.type) {
         case types.CARD_MOVED: {
             if (action.payload.moved_by_me && action.payload.moved_to == 'currentPlayedCard') {
@@ -261,12 +252,13 @@ const deck = (state = [], action) => {
             );
 
             const returnedValue = [...cards_numbers, ...action_cards, ...wild_cards].map(value => value.flat()).flat().sort(() => Math.random() - 0.5);
+
             return returnedValue.map(card => {
                 return {
                     ...card,
                     id: uuidv4()
-                }
-            })
+                };
+            });
         };
         default: return state;
     };
