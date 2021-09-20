@@ -8,6 +8,23 @@
     position: relative;
 }
 
+.room_name_background {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* z-index: -1; */
+}
+
+.room_name_background h1 {
+    color: white;
+    font-size: 40px;
+    text-align: center;
+    vertical-align: middle;
+    letter-spacing: 1px;
+}
+
 .dnd {
     /* background-color: yellowgreen; */
     height: 100%;

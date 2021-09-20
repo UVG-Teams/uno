@@ -329,7 +329,12 @@ const Game = ({
 
     return (
         <div className='game_page'>
-            <div style={{ position: 'absolute' }}>
+            <div className='room_name_background'>
+                <h1>
+                    {gameInfo.roomCode}
+                </h1>
+            </div>
+            <div style={{position: 'absolute'}}>
                 <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close
                 </Button>
