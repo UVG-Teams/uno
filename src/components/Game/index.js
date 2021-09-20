@@ -168,8 +168,10 @@ const Game = ({
                 );
             const moved_card_color = moved_card.content.split("_")[0]
             const moved_card_number = moved_card.content.split("_")[1]
-            if((current_card_color !== moved_card_color) & (current_card_number !== moved_card_number)){
-                return;
+            if(current_card_color !== 'wild'){
+                if((current_card_color !== moved_card_color) & (current_card_number !== moved_card_number) & (moved_card_color !== 'wild')){
+                    return;
+                }
             }
                 
             socket.send(
