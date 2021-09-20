@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import './styles.css';
 import * as selectors from '../../reducers';
 import { actions } from '../../reducers/game';
+import { actions as chatActions } from '../../reducers/chat';
 
 const UnoButton = props => {
   const {onClick} = props;
@@ -34,6 +35,16 @@ export default connect(
         sent_by: player.username,
         sent_at: Date.now(),
       }));
+
+      const message = {
+        type: 'text',
+        sent_by: player.username,
+        text: 'UNO!',
+        sent_at: Date.now(),
+    };
+
+    socket.send(JSON.stringify(message));
+    dispatch(chatActions.sendMessage(message));
       console.log('UNO BUTTON CLICKED AND DATA SENT');
     }
   }),
