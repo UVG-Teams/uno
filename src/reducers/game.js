@@ -128,18 +128,30 @@ const players = (state = [], action) => {
 
             return newState;
         };
-        // if (action.payload.moved_by_me) {
-        //     const newState = [];
+        case types.CARD_MOVED: {
+            if (!action.payload.moved_by_me) {
+                const newState = [];
 
-        //     state.map(card => {
-        //         if (card.id != action.payload.moved_card.id) {
-        //             newState.push(card);
-        //         };
-        //     });
+                state.map(player => {
+                    let tempPlayer = { ...player };
 
-        //     return newState;
-        // }
-        // return state;
+                    if (player.username == action.payload.moved_by) {
+                        if (action.payload.moved_to == 'currentPlayedCard') {
+                            // Puts card
+                            tempPlayer.cards = player.cards - 1;
+                        } else {
+                            // Takes card
+                            tempPlayer.cards = player.cards + 1;
+                        }
+                    };
+
+                    newState.push(tempPlayer);
+                });
+
+                return newState;
+            }
+            return state;
+        };
         default: return state;
     };
 };
@@ -156,7 +168,7 @@ const myCards = (state = [{
 }], action) => {
     switch(action.type) {
         case types.CARD_MOVED: {
-            if (action.payload.moved_by_me) {
+            if (action.payload.moved_by_me && action.payload.moved_to == 'currentPlayedCard') {
                 const newState = [];
 
                 state.map(card => {
@@ -166,7 +178,14 @@ const myCards = (state = [{
                 });
 
                 return newState;
-            }
+            };
+
+            if (action.payload.moved_by_me && action.payload.moved_to != 'currentPlayedCard') {
+                const newState = [ ...state ];
+                newState.push(action.payload.moved_card);
+                return newState;
+            };
+
             return state;
         };
         // case types.CLOSE_GAME_COMPLETED: {
@@ -181,7 +200,7 @@ const currentPlayedCard = (state = null, action) => {
         case types.CARD_MOVED: {
             if (action.payload.moved_to == 'currentPlayedCard') {
                 return action.payload.moved_card;
-            }
+            };
             return state;
         };
         case types.CLOSE_GAME_COMPLETED: {

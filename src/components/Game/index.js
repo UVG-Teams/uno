@@ -66,6 +66,7 @@ const Game = ({
     receiveCardMovement,
     receiveNewUser,
     removePlayer,
+    takeCard,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -204,66 +205,68 @@ const Game = ({
                         )
                     })
                 }
-                <DragDropContext onDragEnd={onDragEnd}>
+                <DragDropContext onDragEnd={ onDragEnd }>
                     <div className='droppables'>
                         <div className='deck_droppable'>
                             <Droppable droppableId='myDeck' direction='horizontal'>
                                 {(provided, snapshot) => (
                                     <div
-                                        ref={provided.innerRef}
-                                        style={getListStyle(snapshot.isDraggingOver)}>
-                                        {myCards.map((item, index) => (
-                                            <Draggable
-                                                key={item.id}
-                                                draggableId={item.id}
-                                                index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        style={getItemStyle(
-                                                            snapshot.isDragging,
-                                                            provided.draggableProps.style
-                                                        )}>
-                                                        <img src={`/images/${item.content}.png`} className='game_cards'/>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
+                                        ref={ provided.innerRef }
+                                        style={ getListStyle(snapshot.isDraggingOver) }>
+                                        {
+                                            myCards.map((item, index) => (
+                                                <Draggable
+                                                    key={ item.id }
+                                                    draggableId={ item.id }
+                                                    index={ index }>
+                                                    {(provided, snapshot) => (
+                                                        <div
+                                                            ref={ provided.innerRef }
+                                                            { ...provided.draggableProps }
+                                                            { ...provided.dragHandleProps }
+                                                            style={getItemStyle(
+                                                                snapshot.isDragging,
+                                                                provided.draggableProps.style
+                                                            )}>
+                                                            <img src={ `/images/${item.content}.png` } className='game_cards' />
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))
+                                        }
+                                        { provided.placeholder }
                                     </div>
                                 )}
                             </Droppable>
                         </div>
                         <div className='table_deck_droppable'>
-                            {/* TODO: Button agarrar carta */}
-                            <img src={deck_1} className='take_card'/>
+                            <Button onClick={ () => takeCard() }>
+                                <img src={ deck_1 } className='take_card'/>
+                            </Button>
                             <Droppable droppableId='playedDeck'>
                                 {(provided, snapshot) => (
                                     <div
-                                        ref={provided.innerRef}
-                                        style={getListStyle(snapshot.isDraggingOver)}>
-                                        {currentPlayedCard.map((item, index) => (
-                                            <Draggable
-                                                key={item.id}
-                                                draggableId={item.id}
-                                                index={index}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        style={getItemStyle(
-                                                            snapshot.isDragging,
-                                                            provided.draggableProps.style
-                                                        )}>
-                                                        <img src={`/images/${item.content}.png`} className='main_game_card'/>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
+                                        ref={ provided.innerRef }
+                                        style={ getListStyle(snapshot.isDraggingOver) }>
+                                        {
+                                            currentPlayedCard.map((item, index) => (
+                                                <Draggable
+                                                    key={ item.id }
+                                                    draggableId={ item.id }
+                                                    index={ index }>
+                                                    {(provided, snapshot) => (
+                                                        <div
+                                                            ref={ provided.innerRef }
+                                                            { ...provided.draggableProps }
+                                                            { ...provided.dragHandleProps }
+                                                            style={ getItemStyle( snapshot.isDragging, provided.draggableProps.style) }>
+                                                            <img src={ `/images/${item.content}.png` } className='main_game_card'/>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))
+                                        }
+                                        { provided.placeholder }
                                     </div>
                                 )}
                             </Droppable>
@@ -321,6 +324,25 @@ export default connect(
         },
         removePlayer(messageData) {
             dispatch(gameState.actions.removePlayer(messageData.sent_by));
+        },
+        takeCard(currentUser) {
+            // TODO: take random select and remove it from deck
+            const randomCard = { id: 'red_3', content: 'red_3' }
+
+            dispatch(gameState.actions.moveCard({
+                moved_by: currentUser.username,
+                moved_card: randomCard,
+                moved_to: currentUser.username,
+                moved_by_me: true
+            }))
+        }
+    }),
+    (stateProps, dispatchProps, ownProps) => ({
+        ...ownProps,
+        ...stateProps,
+        ...dispatchProps,
+        takeCard() {
+            dispatchProps.takeCard(stateProps.currentUser);
         }
     })
 )(Game);
