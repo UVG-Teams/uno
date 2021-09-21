@@ -382,10 +382,10 @@ const Game = ({
                     style={customStyles}
                 >
                     <h2>Elige color</h2>
-                    <button onClick={() => {changeColor(currentUser, socket, 'blue'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
-                    <button onClick={() => {changeColor(currentUser, socket, 'red'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
-                    <button onClick={() => {changeColor(currentUser, socket, 'green'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
-                    <button onClick={() => {changeColor(currentUser, socket, 'yellow'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
+                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
+                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
+                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
+                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
                 </Modal>
             </div>
         </div>
