@@ -18,6 +18,8 @@ export const types = {
     INITIAL_PLAYED_CARD_RECEIVED: 'INITIAL_PLAYED_CARD_RECEIVED',
     ONLINE_PLAYERS_RECEIVED: 'ONLINE_PLAYERS_RECEIVED',
     GAME_INFO_RECEIVED: 'GAME_INFO_RECEIVED',
+    NEW_COLOR_CHANGED: 'NEW_COLOR_CHANGED',
+    NEW_COLOR_PLAYED: 'NEW_COLOR_PLAYED',
 };
 
 export const actions = {
@@ -70,6 +72,10 @@ export const actions = {
     setGameInfo: gameInfo => ({
         type: types.GAME_INFO_RECEIVED,
         payload: gameInfo
+    }),
+    changeNewColor: color => ({
+        type: types.NEW_COLOR_CHANGED,
+        payload: color,
     }),
 };
 
@@ -289,6 +295,15 @@ const deck = (state = [], action) => {
     };
 };
 
+const changedColor = (state = null, action) => {
+    switch(action.type) {
+        case types.NEW_COLOR_CHANGED: {
+            return action.payload
+        };
+        default: return state;
+    }
+}
+
 export default combineReducers({
     gameInfo,
     currentUserInfo,
@@ -296,6 +311,7 @@ export default combineReducers({
     myCards,
     currentPlayedCard,
     deck,
+    changedColor,
 });
 
 export const getGameInfo = state => state.gameInfo;
@@ -304,3 +320,4 @@ export const getCurrentPlayedCard = state => state.currentPlayedCard;
 export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
 export const getDeck = state => state.deck;
+export const getChangedColor = state => state.changedColor;

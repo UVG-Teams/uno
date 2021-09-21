@@ -18,3 +18,4 @@ export const getCurrentPlayedCard = state => gameSelectors.getCurrentPlayedCard(
 export const getMyCards = state => gameSelectors.getMyCards(state.game);
 export const getPlayers = state => gameSelectors.getPlayers(state.game);
 export const getGameDeck = state => gameSelectors.getDeck(state.game);
+export const getChangedColor = state => gameSelectors.getChangedColor(state.game);
