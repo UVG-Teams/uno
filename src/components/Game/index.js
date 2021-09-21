@@ -421,13 +421,13 @@ const Game = ({
                     <h2>Elige color</h2>
                     {/* <img src={ deck_1 } className='take_card'/> */}
                     <div className='container_change_color_buttons'>
-                        <div style={{backgroundColor: 'gray', height: '50%'}}>
-                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} className='btnChangeColorR'>Rojo</button>
-                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} className='btnChangeColorB'>Azul</button>
+                        <div style={{backgroundColor: 'gray', height: '50%', display: 'flex', justifyContent: 'center'}}>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} className='btnChangeColorR'></button>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} className='btnChangeColorB'></button>
                         </div>
-                        <div style={{backgroundColor: 'gray', height: '50%'}}>
-                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} className='btnChangeColorY'>Amarillo</button>
-                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} className='btnChangeColorG'>Verde</button>
+                        <div style={{backgroundColor: 'gray', height: '50%', display: 'flex', justifyContent: 'center'}}>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} className='btnChangeColorY'></button>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} className='btnChangeColorG'></button>
                         </div>
                     </div>
                 </Modal>

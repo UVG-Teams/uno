@@ -77,7 +77,6 @@
 }
 
 .container_change_color_buttons {
-    background-color: salmon;
     height: 70%;
 }
 
@@ -87,7 +86,8 @@
     color:white;
     width: 20%;
     height: 100%;
-    border-radius: 80px 10px 10px 10px;
+    border-radius: 80px 0 0 0;
+    border: inherit;
 }
 
 .btnChangeColorB {
@@ -95,7 +95,8 @@
     color:white;
     width: 20%;
     height: 100%;
-    border-radius: 10px 80px 10px 10px;
+    border-radius: 0 80px 0 0;
+    border: inherit;
 }
 
 .btnChangeColorY {
@@ -103,7 +104,8 @@
     color:white;
     width: 20%;
     height: 100%;
-    border-radius: 10px 10px 10px 80px;
+    border-radius: 0 0 0 80px;
+    border: inherit;
 }
 
 .btnChangeColorG {
@@ -111,5 +113,6 @@
     color:white;
     width: 20%;
     height: 100%;
-    border-radius: 10px 10px 80px 10px;
+    border-radius: 0 0 80px 0;
+    border: inherit;
 }
