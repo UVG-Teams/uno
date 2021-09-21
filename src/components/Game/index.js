@@ -5,6 +5,8 @@ import { TextField, Button } from '@material-ui/core';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
 
+import Modal from 'react-modal';
+
 import deck_1 from '../Resources/deck_1.png';
 import deck_2 from '../Resources/deck_2.png';
 import deck_3 from '../Resources/deck_3.png';
@@ -68,6 +70,7 @@ const Game = ({
     receiveNewUser,
     removePlayer,
     takeCard,
+    changeColor,
     deck,
     sendNewUserCurrentGameState,
     setInitialDeck,
@@ -75,6 +78,8 @@ const Game = ({
     setOnlinePlayers,
     setGameInfo,
     setRandomInitialCard,
+    changedColor,
+    receiveChangeColor,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -82,6 +87,27 @@ const Game = ({
             connectWS();
         };
     }, []);
+
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
+
+    const customStyles = {
+        content: {
+          top: '50%',
+          left: '50%',
+          right: 'auto',
+          bottom: 'auto',
+          marginRight: '-50%',
+          transform: 'translate(-50%, -50%)',
+        },
+      };
 
     if (!gameInfo) {
         return <Redirect to='/' />
@@ -158,6 +184,10 @@ const Game = ({
                         };
                         break;
                     };
+                    case 'change_color': {
+                        receiveChangeColor(messageData);
+                        break;
+                    };
                     default: console.log(messageData);
                 };
             };
@@ -202,13 +232,23 @@ const Game = ({
                 destination
             );
 
-            const moved_card_color = moved_card.content.split("_")[0]
-            const moved_card_number = moved_card.content.split("_")[1]
+            const moved_card_color = moved_card.content.split("_")[0];
+            const moved_card_number = moved_card.content.split("_")[1];
 
-            if ((current_card_color !== moved_card_color) & (current_card_number !== moved_card_number)) {
-                return;
+            if (current_card_color !== 'wild') {
+                if ((current_card_color !== moved_card_color) & (current_card_number !== moved_card_number) & (moved_card_color !== 'wild')) {
+                    return;
+                };
+            } else if (current_card_color == 'wild') {
+                if (moved_card_color !== 'wild' & moved_card_color !== changedColor.color) {
+                    return;
+                };
             };
 
+            if (current_card_color == 'wild') {
+                changeColor(gameInfo, currentUser, socket, null);
+            };
+                
             socket.send(
                 JSON.stringify({
                     type: 'game_move',
@@ -221,8 +261,17 @@ const Game = ({
             );
 
             moveMyCard(currentUser.username, moved_card, 'currentPlayedCard');
+
+            if (moved_card_color == 'wild') {
+                openModal();
+            };
+            
         };
     };
+
+    console.log(changedColor)
+
+    
 
     return (
         <div className='game_page'>
@@ -325,6 +374,20 @@ const Game = ({
                 </DragDropContext>
                 <Chat/>
             </div>
+            <div>
+                <Modal
+                    isOpen={modalIsOpen}
+                    onRequestClose={closeModal}
+                    contentLabel="Example Modal"
+                    style={customStyles}
+                >
+                    <h2>Elige color</h2>
+                    <button onClick={() => {changeColor(currentUser, socket, 'blue'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
+                    <button onClick={() => {changeColor(currentUser, socket, 'red'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
+                    <button onClick={() => {changeColor(currentUser, socket, 'green'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
+                    <button onClick={() => {changeColor(currentUser, socket, 'yellow'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
+                </Modal>
+            </div>
         </div>
     );
 };
@@ -338,6 +401,7 @@ export default connect(
         myCards: selectors.getMyCards(state),
         players: selectors.getPlayers(state),
         deck: selectors.getGameDeck(state),
+        changedColor: selectors.getChangedColor(state),
     }),
     dispatch => ({
         connectWS() {
@@ -432,7 +496,26 @@ export default connect(
                 moved_by: currentUser.username,
                 moved_card: randomCard,
             }));
-        }
+        },
+        changeColor(gameInfo, currentUser, socket, color) {
+            socket.send(
+                JSON.stringify({
+                    type: 'change_color',
+                    roomCode: gameInfo.roomCode,
+                    sent_by: currentUser.username,
+                    color: color,
+                })
+            );
+
+            dispatch(gameState.actions.changeNewColor({
+                color: color,
+            }))
+        },
+        receiveChangeColor(messageData) {
+            dispatch(gameState.actions.changeNewColor({
+                color: messageData.color,
+            }))
+        },
     }),
     (stateProps, dispatchProps, ownProps) => ({
         ...ownProps,
