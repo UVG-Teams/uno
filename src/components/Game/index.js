@@ -106,6 +106,8 @@ const Game = ({
           bottom: 'auto',
           marginRight: '-50%',
           transform: 'translate(-50%, -50%)',
+          height: '30%',
+          width: '25%',
         },
       };
 
@@ -417,10 +419,17 @@ const Game = ({
                     style={customStyles}
                 >
                     <h2>Elige color</h2>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
+                    {/* <img src={ deck_1 } className='take_card'/> */}
+                    <div className='container_change_color_buttons'>
+                        <div style={{backgroundColor: 'gray', height: '50%'}}>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} className='btnChangeColorR'>Rojo</button>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} className='btnChangeColorB'>Azul</button>
+                        </div>
+                        <div style={{backgroundColor: 'gray', height: '50%'}}>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} className='btnChangeColorY'>Amarillo</button>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} className='btnChangeColorG'>Verde</button>
+                        </div>
+                    </div>
                 </Modal>
             </div>
         </div>
