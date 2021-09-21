@@ -9,7 +9,7 @@ import backCard from '../Resources/deck_1.png';
 import * as gameState from '../../reducers/game';
 
 
-const Login = ({ gameInfo, createGame, endgame }) => {
+const Login = ({ gameInfo, createGame, endgame, joinGame }) => {
 
     const [username, setUsername] = useState('');
     const [roomCode, setRoomCode] = useState('');
@@ -49,16 +49,29 @@ const Login = ({ gameInfo, createGame, endgame }) => {
                         label='Room Password'
                         className='login_inputs'
                         value={ password }
+                        type={ 'password' }
                         onChange={ e => setPassword(e.target.value) }
                     />
                 </div>
 
                 <div className='login_button'>
-                    <Button variant='contained' color='primary'>Sign in</Button>
+                    <Button
+                        onClick={ () => joinGame(username, roomCode, password) }
+                        variant='contained'
+                        color='primary'
+                    >
+                        Sign in
+                    </Button>
                 </div>
 
                 <div className='login_button'>
-                    <Button onClick={ () => createGame(username, roomCode, password) } variant='contained' color='primary'>Create Room</Button>
+                    <Button
+                        onClick={ () => createGame(username, roomCode, password) }
+                        variant='contained'
+                        color='primary'
+                    >
+                        Create Room
+                    </Button>
                 </div>
 
                 <div className='login_img_container'>
@@ -83,9 +96,9 @@ export default connect(
         createGame(username, roomCode, password) {
 
             // eslint-disable-next-line eqeqeq
-            if (!username || username == "") {
-                return
-            }
+            if (!username || username == "") { return; };
+            if (!roomCode || roomCode == "") { return; };
+            if (!password || password == "") { return; };
 
             const gameData = {
                 roomCode,
@@ -99,6 +112,25 @@ export default connect(
 
             dispatch(gameState.actions.startCreatingGame(gameData));
             dispatch(gameState.actions.setCurrentUserInfo(userData));
+
+        },
+        joinGame(username, roomCode, password) {
+
+            if (!username || username == "") { return; };
+            if (!roomCode || roomCode == "") { return; };
+            if (!password || password == "") { return; };
+
+            const joinPetitionData = {
+                player: username,
+                roomCode,
+                password,
+            };
+
+            const userData = { username };
+
+            dispatch(gameState.actions.startJoiningGame(joinPetitionData));
+            dispatch(gameState.actions.setCurrentUserInfo(userData));
+
         },
         endgame() {
             dispatch(gameState.actions.startClosingGame());

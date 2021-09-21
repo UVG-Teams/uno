@@ -10,19 +10,21 @@ function* leaveGame(action) {
     console.log("Leaving game...");
 
     const currentUser = yield select(selectors.getCurrentUserInfo);
+    const gameInfo = yield select(selectors.getGameInfo);
     const socket = yield select(selectors.getSocket);
 
     if (socket && currentUser) {
         socket.send(
             JSON.stringify({
                 type: 'leave_game',
+                roomCode: gameInfo.roomCode,
                 sent_by: currentUser.username,
                 sent_at: Date.now(),
             })
         );
-    
+
         socket.close();
-    }
+    };
 
     yield put(socketState.actions.destroyWSConnection());
     yield put(gameState.actions.completeClosingGame());

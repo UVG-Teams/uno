@@ -56,12 +56,14 @@ export default connect(
     state => ({
         currentUser: selectors.getCurrentUserInfo(state),
         socket: selectors.getSocket(state),
+        gameInfo: selectors.getGameInfo(state),
         chat_messages: selectors.getMessages(state),
     }),
     dispatch => ({
-        sendMessage(currentUser, socket, messageText) {
+        sendMessage(gameInfo, currentUser, socket, messageText) {
             const message = {
                 type: 'text',
+                roomCode: gameInfo.roomCode,
                 sent_by: currentUser.username,
                 text: messageText,
                 sent_at: Date.now(),
@@ -76,7 +78,7 @@ export default connect(
         ...stateProps,
         ...ownProps,
         sendMessage(messageText) {
-            dispatchProps.sendMessage(stateProps.currentUser, stateProps.socket, messageText)
+            dispatchProps.sendMessage(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, messageText)
         }
     })
 )(Chat);
