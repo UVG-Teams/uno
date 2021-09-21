@@ -156,7 +156,31 @@ const Game = ({
                                     sendNewUserCurrentGameState(messageData);
                                 };
                             } else {
-                                // TODO: respond to messageData.sent_by that this player already exists
+                                if (currentUser.username == gameInfo.roomOwner) {
+                                    socket.send(
+                                        JSON.stringify({
+                                            type: 'error_alert',
+                                            roomCode: gameInfo.roomCode,
+                                            sent_to: messageData.sent_by,
+                                            sent_by: currentUser.username,
+                                            text: `Ya hay un user con ese nombre`,
+                                            sent_at: Date.now(),
+                                        })
+                                    );
+                                };
+                            };
+                        } else {
+                            if (currentUser.username == gameInfo.roomOwner) {
+                                socket.send(
+                                    JSON.stringify({
+                                        type: 'error_alert',
+                                        roomCode: gameInfo.roomCode,
+                                        sent_to: messageData.sent_by,
+                                        sent_by: currentUser.username,
+                                        text: `Password incorrecta`,
+                                        sent_at: Date.now(),
+                                    })
+                                );
                             };
                         };
 
@@ -189,6 +213,18 @@ const Game = ({
                     };
                     case 'change_color': {
                         receiveChangeColor(messageData);
+                        break;
+                    };
+                    case 'error_alert': {
+                        if (messageData.sent_to == currentUser.username) {
+                            receiveChatMessage({
+                                type: 'text',
+                                sent_by: messageData.sent_by,
+                                text: messageData.text,
+                                sent_at: messageData.sent_at,
+                            });
+                            alert(messageData.text);
+                        };
                         break;
                     };
                     default: console.log(messageData);
