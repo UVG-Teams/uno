@@ -6,8 +6,7 @@ const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
 export const types = {
     CREATE_GAME_STARTED: 'CREATE_GAME_STARTED',
-    CREATE_GAME_COMPLETED: 'CREATE_GAME_COMPLETED',
-    CREATE_GAME_FAILED: 'CREATE_GAME_FAILED',
+    JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
     CLOSE_GAME_STARTED: 'CLOSE_GAME_STARTED',
     CLOSE_GAME_COMPLETED: 'CLOSE_GAME_COMPLETED',
     CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
@@ -19,9 +18,6 @@ export const types = {
     INITIAL_PLAYED_CARD_RECEIVED: 'INITIAL_PLAYED_CARD_RECEIVED',
     ONLINE_PLAYERS_RECEIVED: 'ONLINE_PLAYERS_RECEIVED',
     GAME_INFO_RECEIVED: 'GAME_INFO_RECEIVED',
-    // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
-    // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
-    // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
 };
 
 export const actions = {
@@ -29,13 +25,9 @@ export const actions = {
         type: types.CREATE_GAME_STARTED,
         payload: data
     }),
-    completeCreatingGame: data => ({
-        type: types.CREATE_GAME_COMPLETED,
-        payload: data
-    }),
-    failCreatingGame: error => ({
-        type: types.CREATE_GAME_FAILED,
-        payload: { error }
+    startJoiningGame: joinData => ({
+        type: types.JOIN_GAME_STARTED,
+        payload: joinData
     }),
     startClosingGame: () => ({
         type: types.CLOSE_GAME_STARTED,
@@ -79,18 +71,6 @@ export const actions = {
         type: types.GAME_INFO_RECEIVED,
         payload: gameInfo
     }),
-    // startJoiningGame: () => ({
-    //     type: types.JOIN_GAME_STARTED,
-    //     payload: null
-    // }),
-    // completeJoiningGame: () => ({
-    //     type: types.JOIN_GAME_COMPLETED,
-    //     payload: null
-    // }),
-    // failJoiningGame: error => ({
-    //     type: types.JOIN_GAME_FAILED,
-    //     payload: { error }
-    // }),
 };
 
 const gameInfo = (state = null, action) => {
@@ -101,24 +81,12 @@ const gameInfo = (state = null, action) => {
         case types.CREATE_GAME_STARTED: {
             return action.payload;
         };
-        case types.CREATE_GAME_COMPLETED: {
-            return null;
-        };
-        case types.CREATE_GAME_FAILED: {
-            return null;
+        case types.JOIN_GAME_STARTED: {
+            return action.payload;
         };
         case types.CLOSE_GAME_COMPLETED: {
             return null;
         };
-        // case types.JOIN_GAME_STARTED: {
-        //     return null;
-        // };
-        // case types.JOIN_GAME_COMPLETED: {
-        //     return action.payload;
-        // };
-        // case types.JOIN_GAME_FAILED: {
-        //     return null;
-        // };
         default: return state;
     };
 };
@@ -220,9 +188,9 @@ const myCards = (state = [], action) => {
 
             return state;
         };
-        // case types.CLOSE_GAME_COMPLETED: {
-        //     return [];
-        // };
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
         default: return state;
     };
 };

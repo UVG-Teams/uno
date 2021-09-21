@@ -89,71 +89,78 @@ const Game = ({
 
     if (socket) {
         socket.onopen = function(event) {
-            // Send an initial message
-            socket.send(
-                JSON.stringify({
-                    type: 'sign_in',
-                    sent_by: currentUser.username,
-                    text: `Hola, soy ${currentUser.username}!`,
-                    sent_at: Date.now(),
-                })
-            );
-
             if (currentUser.username == gameInfo.roomOwner) {
                 setRandomInitialCard();
-            }
+            } else {
+                // Send an initial message for joining room
+                socket.send(
+                    JSON.stringify({
+                        type: 'join_game',
+                        roomCode: gameInfo.roomCode,
+                        sent_by: currentUser.username,
+                        text: `Hola, soy ${currentUser.username}!`,
+                        sent_at: Date.now(),
+                        password: gameInfo.password,
+                    })
+                );
+            };
         };
-        
+
         // Listen for messages
         socket.onmessage = function(event) {
             const messageData = JSON.parse(event.data);
-            switch(messageData.type) {
-                case 'text': {
-                    receiveChatMessage(messageData);
-                    break;
-                };
-                case 'game_move': {
-                    receiveCardMovement(messageData);
-                    break;
-                };
-                case 'sign_in': {
-                    // TODO: validar que no haya un user con ese nombre
-                    receiveChatMessage(messageData);
-                    receiveNewUser(messageData);
 
-                    if (currentUser.username == gameInfo.roomOwner) {
-                        sendNewUserCurrentGameState(messageData);
-                    }
+            if (messageData.roomCode == gameInfo.roomCode) {
+                switch(messageData.type) {
+                    case 'text': {
+                        receiveChatMessage(messageData);
+                        break;
+                    };
+                    case 'game_move': {
+                        receiveCardMovement(messageData);
+                        break;
+                    };
+                    case 'join_game': {
+                        // TODO: validar que no haya un user con ese nombre
+                        if (messageData.password == gameInfo.password) {
+                            receiveChatMessage(messageData);
+                            receiveNewUser(messageData);
 
-                    break;
-                };
-                case 'leave_game': {
-                    receiveChatMessage({
-                        type: 'text',
-                        sent_by: messageData.sent_by,
-                        text: 'Adios',
-                        sent_at: messageData.sent_at,
-                    });
-                    removePlayer(messageData);
-                    break;
-                };
-                case 'welcome': {
-                    if (messageData.sent_to == currentUser.username) {
+                            if (currentUser.username == gameInfo.roomOwner) {
+                                sendNewUserCurrentGameState(messageData);
+                            };
+                        };
+
+                        break;
+                    };
+                    case 'leave_game': {
                         receiveChatMessage({
                             type: 'text',
                             sent_by: messageData.sent_by,
-                            text: messageData.text,
+                            text: 'Adios',
                             sent_at: messageData.sent_at,
                         });
-                        setInitialDeck(messageData);
-                        setInitialPlayedCard(messageData);
-                        setOnlinePlayers(messageData);
-                        setGameInfo(messageData);
+                        removePlayer(messageData);
+                        break;
                     };
-                    break;
+                    case 'welcome': {
+                        if (messageData.sent_to == currentUser.username) {
+                            receiveChatMessage({
+                                type: 'text',
+                                sent_by: messageData.sent_by,
+                                text: messageData.text,
+                                sent_at: messageData.sent_at,
+                            });
+                            setInitialDeck(messageData);
+                            setInitialPlayedCard(messageData);
+                            setOnlinePlayers(messageData);
+                            setGameInfo(messageData);
+                        };
+                        break;
+                    };
+                    default: console.log(messageData);
                 };
-                default: console.log(messageData);
-            }
+            };
         };
 
         // Listen for socket closes
@@ -173,16 +180,16 @@ const Game = ({
         const current_card_color = currentPlayedCard[0].content.split("_")[0];
         const current_card_number = currentPlayedCard[0].content.split("_")[1];
         const { source, destination } = result;
-        
+
         // Dropped outside the list, then return card to origin
         if (!destination) {
             return;
-        }
+        };
 
         // Can't move out the card on the game deck
         if (source.droppableId == 'playedDeck') {
             return;
-        }
+        };
 
         // Can't reorder cards
         if (source.droppableId === destination.droppableId) {
@@ -193,23 +200,27 @@ const Game = ({
                 getList(destination.droppableId),
                 source,
                 destination
-                );
+            );
+
             const moved_card_color = moved_card.content.split("_")[0]
             const moved_card_number = moved_card.content.split("_")[1]
-            if((current_card_color !== moved_card_color) & (current_card_number !== moved_card_number)){
+
+            if ((current_card_color !== moved_card_color) & (current_card_number !== moved_card_number)) {
                 return;
-            }
-                
+            };
+
             socket.send(
                 JSON.stringify({
                     type: 'game_move',
+                    roomCode: gameInfo.roomCode,
                     sent_by: currentUser.username,
                     moved_card: moved_card,
                     sent_at: Date.now(),
                     moved_to: 'currentPlayedCard',
                 })
             );
-            moveMyCard(currentUser.username, moved_card, 'currentPlayedCard')
+
+            moveMyCard(currentUser.username, moved_card, 'currentPlayedCard');
         };
     };
 
@@ -315,8 +326,8 @@ const Game = ({
                 <Chat/>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default connect(
     state => ({
@@ -365,12 +376,13 @@ export default connect(
         removePlayer(messageData) {
             dispatch(gameState.actions.removePlayer(messageData.sent_by));
         },
-        takeCard(currentUser, deck, socket) {
+        takeCard(gameInfo, currentUser, deck, socket) {
             const randomCard = deck.pop();
 
             socket.send(
                 JSON.stringify({
                     type: 'game_move',
+                    roomCode: gameInfo.roomCode,
                     sent_by: currentUser.username,
                     moved_card: randomCard,
                     sent_at: Date.now(),
@@ -389,6 +401,7 @@ export default connect(
             socket.send(
                 JSON.stringify({
                     type: 'welcome',
+                    roomCode: gameInfo.roomCode,
                     sent_by: currentUser.username,
                     game_info: gameInfo,
                     current_played_card: currentPlayedCard,
@@ -426,7 +439,7 @@ export default connect(
         ...stateProps,
         ...dispatchProps,
         takeCard() {
-            dispatchProps.takeCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
+            dispatchProps.takeCard(stateProps.gameInfo, stateProps.currentUser, stateProps.deck, stateProps.socket);
         },
         sendNewUserCurrentGameState(messageData) {
             dispatchProps.sendNewUserCurrentGameState(
