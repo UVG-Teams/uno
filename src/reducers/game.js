@@ -14,6 +14,8 @@ export const types = {
     CARD_MOVED: 'CARD_MOVED',
     NEW_USER_RECEIVED: 'NEW_USER_RECEIVED',
     PLAYER_REMOVED: 'PLAYER_REMOVED',
+    NEW_COLOR_CHANGED: 'NEW_COLOR_CHANGED',
+    NEW_COLOR_PLAYED: 'NEW_COLOR_PLAYED',
     // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
     // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
     // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
@@ -53,7 +55,12 @@ export const actions = {
     removePlayer: username => ({
         type: types.PLAYER_REMOVED,
         payload: username
+    }),
+    changeNewColor: color => ({
+        type: types.NEW_COLOR_CHANGED,
+        payload: color,
     })
+
     // startJoiningGame: () => ({
     //     type: types.JOIN_GAME_STARTED,
     //     payload: null
@@ -264,6 +271,15 @@ const deck = (state = [], action) => {
     };
 };
 
+const changedColor = (state = null, action) => {
+    switch(action.type) {
+        case types.NEW_COLOR_CHANGED: {
+            return action.payload
+        };
+        default: return state;
+    }
+}
+
 export default combineReducers({
     gameInfo,
     currentUserInfo,
@@ -271,6 +287,7 @@ export default combineReducers({
     myCards,
     currentPlayedCard,
     deck,
+    changedColor,
 });
 
 export const getGameInfo = state => state.gameInfo;
@@ -279,3 +296,4 @@ export const getCurrentPlayedCard = state => state.currentPlayedCard;
 export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
 export const getDeck = state => state.deck;
+export const getChangedColor = state => state.changedColor;
