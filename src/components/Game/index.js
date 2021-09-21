@@ -147,13 +147,16 @@ const Game = ({
                         break;
                     };
                     case 'join_game': {
-                        // TODO: validar que no haya un user con ese nombre
                         if (messageData.password == gameInfo.password) {
-                            receiveChatMessage(messageData);
-                            receiveNewUser(messageData);
+                            if (!players.map(player => player.username).includes(messageData.sent_by)) {
+                                receiveNewUser(messageData);
+                                receiveChatMessage(messageData);
 
-                            if (currentUser.username == gameInfo.roomOwner) {
-                                sendNewUserCurrentGameState(messageData);
+                                if (currentUser.username == gameInfo.roomOwner) {
+                                    sendNewUserCurrentGameState(messageData);
+                                };
+                            } else {
+                                // TODO: respond to messageData.sent_by that this player already exists
                             };
                         };
 
@@ -248,7 +251,7 @@ const Game = ({
             if (current_card_color == 'wild') {
                 changeColor(gameInfo, currentUser, socket, null);
             };
-                
+
             socket.send(
                 JSON.stringify({
                     type: 'game_move',
@@ -265,13 +268,9 @@ const Game = ({
             if (moved_card_color == 'wild') {
                 openModal();
             };
-            
+
         };
     };
-
-    console.log(changedColor)
-
-    
 
     return (
         <div className='game_page'>
@@ -462,6 +461,16 @@ export default connect(
             }));
         },
         sendNewUserCurrentGameState(currentUser, socket, gameInfo, currentPlayedCard, players, deck, new_username) {
+
+            if (players.map(player => player.username).includes(new_username)) {
+                console.log('players', players);
+            } else {
+                players.push({
+                    username: new_username,
+                    cards: 0
+                });
+            };
+
             socket.send(
                 JSON.stringify({
                     type: 'welcome',
