@@ -440,7 +440,7 @@ const Game = ({
             {/* Modal when there is a winner */}
             <div>
                 <Modal
-                    isOpen= {true}
+                    isOpen= {false}
                     onRequestClose={closeModal}
                     contentLabel="Example Modal"
                     style={customStyles2}
