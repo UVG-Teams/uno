@@ -84,7 +84,6 @@ export default connect(
 
             socket.send(JSON.stringify(message));
             dispatch(chatState.actions.sendMessage(message));
-            text.value = ""
         }
     }),
     (stateProps, dispatchProps, ownProps) => ({
