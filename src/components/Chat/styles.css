@@ -28,6 +28,12 @@
 .chat_messages {
     height: 70%;
     overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+chat_messages::-webkit-scrollbar {
+    display: none;
 }
 
 .chat_write_message {
