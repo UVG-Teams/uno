@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import CryptoJS from 'crypto-js';
 import { connect } from 'react-redux';
+import React, { useState } from 'react';
 import { TextField, Button } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -69,7 +70,14 @@ export default connect(
                 sent_at: Date.now(),
             };
 
-            socket.send(JSON.stringify(message));
+            const headers = btoa(JSON.stringify({ roomCode: gameInfo.roomCode }));
+            const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(message), gameInfo.password).toString();
+
+            socket.send(JSON.stringify({
+                headers: headers,
+                body: ciphertext
+            }));
+
             dispatch(chatState.actions.sendMessage(message));
         }
     }),

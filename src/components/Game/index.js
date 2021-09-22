@@ -1,3 +1,4 @@
+import CryptoJS from 'crypto-js';
 import React , { useState, useEffect } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { Redirect } from 'react-router-dom';
@@ -80,6 +81,7 @@ const Game = ({
     setRandomInitialCard,
     changedColor,
     receiveChangeColor,
+    socket_send,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -119,16 +121,14 @@ const Game = ({
                 setRandomInitialCard();
             } else {
                 // Send an initial message for joining room
-                socket.send(
-                    JSON.stringify({
-                        type: 'join_game',
-                        roomCode: gameInfo.roomCode,
-                        sent_by: currentUser.username,
-                        text: `Hola, soy ${currentUser.username}!`,
-                        sent_at: Date.now(),
-                        password: gameInfo.password,
-                    })
-                );
+                socket_send(gameInfo, socket, {
+                    type: 'join_game',
+                    roomCode: gameInfo.roomCode,
+                    sent_by: currentUser.username,
+                    text: `Hola, soy ${currentUser.username}!`,
+                    sent_at: Date.now(),
+                    password: gameInfo.password,
+                });
             };
         };
 
@@ -136,51 +136,58 @@ const Game = ({
         socket.onmessage = function(event) {
             const messageData = JSON.parse(event.data);
 
-            if (messageData.roomCode == gameInfo.roomCode) {
-                switch(messageData.type) {
+            if (!messageData.headers || !messageData.body) {
+                console.log("Unexpected message: ", messageData);
+                return;
+            };
+
+            const headers = JSON.parse(atob(messageData.headers));
+
+            if (headers.roomCode == gameInfo.roomCode) {
+
+                const bytes = CryptoJS.AES.decrypt(messageData.body, gameInfo.password);
+                const body = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+                switch(body.type) {
                     case 'text': {
-                        receiveChatMessage(messageData);
+                        receiveChatMessage(body);
                         break;
                     };
                     case 'game_move': {
-                        receiveCardMovement(messageData);
+                        receiveCardMovement(body);
                         break;
                     };
                     case 'join_game': {
-                        if (messageData.password == gameInfo.password) {
-                            if (!players.map(player => player.username).includes(messageData.sent_by)) {
-                                receiveNewUser(messageData);
-                                receiveChatMessage(messageData);
+                        if (body.password == gameInfo.password) {
+                            if (!players.map(player => player.username).includes(body.sent_by)) {
+                                receiveNewUser(body);
+                                receiveChatMessage(body);
 
                                 if (currentUser.username == gameInfo.roomOwner) {
-                                    sendNewUserCurrentGameState(messageData);
+                                    sendNewUserCurrentGameState(body);
                                 };
                             } else {
                                 if (currentUser.username == gameInfo.roomOwner) {
-                                    socket.send(
-                                        JSON.stringify({
-                                            type: 'error_alert',
-                                            roomCode: gameInfo.roomCode,
-                                            sent_to: messageData.sent_by,
-                                            sent_by: currentUser.username,
-                                            text: `Ya hay un user con ese nombre`,
-                                            sent_at: Date.now(),
-                                        })
-                                    );
+                                    socket_send(gameInfo, socket, {
+                                        type: 'error_alert',
+                                        roomCode: gameInfo.roomCode,
+                                        sent_to: body.sent_by,
+                                        sent_by: currentUser.username,
+                                        text: `Ya hay un user con ese nombre`,
+                                        sent_at: Date.now(),
+                                    });
                                 };
                             };
                         } else {
                             if (currentUser.username == gameInfo.roomOwner) {
-                                socket.send(
-                                    JSON.stringify({
+                                socket_send(gameInfo, socket, {
                                         type: 'error_alert',
                                         roomCode: gameInfo.roomCode,
-                                        sent_to: messageData.sent_by,
+                                        sent_to: body.sent_by,
                                         sent_by: currentUser.username,
                                         text: `Password incorrecta`,
                                         sent_at: Date.now(),
-                                    })
-                                );
+                                });
                             };
                         };
 
@@ -189,45 +196,45 @@ const Game = ({
                     case 'leave_game': {
                         receiveChatMessage({
                             type: 'text',
-                            sent_by: messageData.sent_by,
+                            sent_by: body.sent_by,
                             text: 'Adios',
-                            sent_at: messageData.sent_at,
+                            sent_at: body.sent_at,
                         });
-                        removePlayer(messageData);
+                        removePlayer(body);
                         break;
                     };
                     case 'welcome': {
-                        if (messageData.sent_to == currentUser.username) {
+                        if (body.sent_to == currentUser.username) {
                             receiveChatMessage({
                                 type: 'text',
-                                sent_by: messageData.sent_by,
-                                text: messageData.text,
-                                sent_at: messageData.sent_at,
+                                sent_by: body.sent_by,
+                                text: body.text,
+                                sent_at: body.sent_at,
                             });
-                            setInitialDeck(messageData);
-                            setInitialPlayedCard(messageData);
-                            setOnlinePlayers(messageData);
-                            setGameInfo(messageData);
+                            setInitialDeck(body);
+                            setInitialPlayedCard(body);
+                            setOnlinePlayers(body);
+                            setGameInfo(body);
                         };
                         break;
                     };
                     case 'change_color': {
-                        receiveChangeColor(messageData);
+                        receiveChangeColor(body);
                         break;
                     };
                     case 'error_alert': {
-                        if (messageData.sent_to == currentUser.username) {
+                        if (body.sent_to == currentUser.username) {
                             receiveChatMessage({
                                 type: 'text',
-                                sent_by: messageData.sent_by,
-                                text: messageData.text,
-                                sent_at: messageData.sent_at,
+                                sent_by: body.sent_by,
+                                text: body.text,
+                                sent_at: body.sent_at,
                             });
-                            alert(messageData.text);
+                            alert(body.text);
                         };
                         break;
                     };
-                    default: console.log(messageData);
+                    default: console.log(body);
                 };
             };
         };
@@ -285,19 +292,17 @@ const Game = ({
             };
 
             if (current_card_color == 'wild') {
-                changeColor(gameInfo, currentUser, socket, null);
+                changeColor(null);
             };
 
-            socket.send(
-                JSON.stringify({
-                    type: 'game_move',
-                    roomCode: gameInfo.roomCode,
-                    sent_by: currentUser.username,
-                    moved_card: moved_card,
-                    sent_at: Date.now(),
-                    moved_to: 'currentPlayedCard',
-                })
-            );
+            socket_send(gameInfo, socket, {
+                type: 'game_move',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                moved_card: moved_card,
+                sent_at: Date.now(),
+                moved_to: 'currentPlayedCard',
+            });
 
             moveMyCard(currentUser.username, moved_card, 'currentPlayedCard');
 
@@ -417,10 +422,10 @@ const Game = ({
                     style={customStyles}
                 >
                     <h2>Elige color</h2>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
+                    <button onClick={() => {changeColor('blue'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
+                    <button onClick={() => {changeColor('red'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
+                    <button onClick={() => {changeColor('green'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
+                    <button onClick={() => {changeColor('yellow'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
                 </Modal>
             </div>
         </div>
@@ -441,7 +446,17 @@ export default connect(
     dispatch => ({
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
-                url: 'ws://localhost:8080'
+                // url: 'ws://localhost:8080',
+                url: 'ws://18.135.12.10:8080',
+            }));
+        },
+        socket_send(gameInfo, socket, messageData) {
+            const headers = btoa(JSON.stringify({ roomCode: gameInfo.roomCode }));
+            const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(messageData), gameInfo.password).toString();
+
+            socket.send(JSON.stringify({
+                headers: headers,
+                body: ciphertext
             }));
         },
         endgame() {
@@ -475,19 +490,17 @@ export default connect(
         removePlayer(messageData) {
             dispatch(gameState.actions.removePlayer(messageData.sent_by));
         },
-        takeCard(gameInfo, currentUser, deck, socket) {
+        takeCard(gameInfo, currentUser, deck, socket, socket_send) {
             const randomCard = deck.pop();
 
-            socket.send(
-                JSON.stringify({
-                    type: 'game_move',
-                    roomCode: gameInfo.roomCode,
-                    sent_by: currentUser.username,
-                    moved_card: randomCard,
-                    sent_at: Date.now(),
-                    moved_to: currentUser.username,
-                })
-            );
+            socket_send(gameInfo, socket, {
+                type: 'game_move',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                moved_card: randomCard,
+                sent_at: Date.now(),
+                moved_to: currentUser.username,
+            });
 
             dispatch(gameState.actions.moveCard({
                 moved_by: currentUser.username,
@@ -496,7 +509,7 @@ export default connect(
                 moved_by_me: true
             }));
         },
-        sendNewUserCurrentGameState(currentUser, socket, gameInfo, currentPlayedCard, players, deck, new_username) {
+        sendNewUserCurrentGameState(currentUser, socket, socket_send, gameInfo, currentPlayedCard, players, deck, new_username) {
 
             if (players.map(player => player.username).includes(new_username)) {
                 console.log('players', players);
@@ -507,20 +520,18 @@ export default connect(
                 });
             };
 
-            socket.send(
-                JSON.stringify({
-                    type: 'welcome',
-                    roomCode: gameInfo.roomCode,
-                    sent_by: currentUser.username,
-                    game_info: gameInfo,
-                    current_played_card: currentPlayedCard,
-                    players: players,
-                    deck: deck,
-                    sent_to: new_username,
-                    text: `Bienvenido ${new_username}`,
-                    sent_at: Date.now(),
-                })
-            )
+            socket_send(gameInfo, socket, {
+                type: 'welcome',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                game_info: gameInfo,
+                current_played_card: currentPlayedCard,
+                players: players,
+                deck: deck,
+                sent_to: new_username,
+                text: `Bienvenido ${new_username}`,
+                sent_at: Date.now(),
+            });
         },
         setInitialDeck(messageData) {
             dispatch(gameState.actions.setInitialDeck(messageData.deck));
@@ -542,15 +553,13 @@ export default connect(
                 moved_card: randomCard,
             }));
         },
-        changeColor(gameInfo, currentUser, socket, color) {
-            socket.send(
-                JSON.stringify({
-                    type: 'change_color',
-                    roomCode: gameInfo.roomCode,
-                    sent_by: currentUser.username,
-                    color: color,
-                })
-            );
+        changeColor(gameInfo, currentUser, socket, socket_send, color) {
+            socket_send(gameInfo, socket, {
+                type: 'change_color',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                color: color,
+            });
 
             dispatch(gameState.actions.changeNewColor({
                 color: color,
@@ -567,12 +576,13 @@ export default connect(
         ...stateProps,
         ...dispatchProps,
         takeCard() {
-            dispatchProps.takeCard(stateProps.gameInfo, stateProps.currentUser, stateProps.deck, stateProps.socket);
+            dispatchProps.takeCard(stateProps.gameInfo, stateProps.currentUser, stateProps.deck, stateProps.socket, dispatchProps.socket_send);
         },
         sendNewUserCurrentGameState(messageData) {
             dispatchProps.sendNewUserCurrentGameState(
                 stateProps.currentUser,
                 stateProps.socket,
+                dispatchProps.socket_send,
                 stateProps.gameInfo,
                 stateProps.currentPlayedCard,
                 stateProps.players,
@@ -582,6 +592,9 @@ export default connect(
         },
         setRandomInitialCard() {
             dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
+        },
+        changeColor(color) {
+            dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color)
         }
     })
 )(Game);
