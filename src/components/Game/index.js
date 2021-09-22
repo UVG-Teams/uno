@@ -448,6 +448,14 @@ const Game = ({
                     <div style={{position: 'relative', display: 'flex', flexDirection: 'column', alignItems:'center'}}>
                         <h1 style={{position: 'absolute'}}>"User" Won!</h1>
                         <img src={ winnerGIF } className='winnerIMG'/>
+                        <Button
+                            onClick={ () => endgame() }
+                            variant='contained'
+                            color='primary'
+                            style={{position: 'absolute', marginTop: '65%'}}
+                        >
+                            Home
+                        </Button>
                     </div>
                     
                 </Modal>
