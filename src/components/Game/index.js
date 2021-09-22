@@ -106,7 +106,7 @@ const Game = ({
           bottom: 'auto',
           marginRight: '-50%',
           transform: 'translate(-50%, -50%)',
-          height: '30%',
+          height: '40%',
           width: '25%',
         },
       };
@@ -418,14 +418,13 @@ const Game = ({
                     contentLabel="Example Modal"
                     style={customStyles}
                 >
-                    <h2>Elige color</h2>
-                    {/* <img src={ deck_1 } className='take_card'/> */}
+                    <h2>Choose new color</h2>
                     <div className='container_change_color_buttons'>
-                        <div style={{backgroundColor: 'gray', height: '50%', display: 'flex', justifyContent: 'center'}}>
+                        <div style={{height: '50%', display: 'flex', justifyContent: 'center'}}>
                             <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} className='btnChangeColorR'></button>
                             <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} className='btnChangeColorB'></button>
                         </div>
-                        <div style={{backgroundColor: 'gray', height: '50%', display: 'flex', justifyContent: 'center'}}>
+                        <div style={{height: '50%', display: 'flex', justifyContent: 'center'}}>
                             <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} className='btnChangeColorY'></button>
                             <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} className='btnChangeColorG'></button>
                         </div>
