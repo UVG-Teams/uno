@@ -8,6 +8,13 @@ import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
 import Modal from 'react-modal';
 
 import deck_1 from '../Resources/deck_1.png';
+import deck_2 from '../Resources/deck_2.png';
+import deck_3 from '../Resources/deck_3.png';
+import deck_4 from '../Resources/deck_4.png';
+import deck_5 from '../Resources/deck_5.png';
+import deck_6 from '../Resources/deck_6.png';
+import deck_7 from '../Resources/deck_7.png';
+import deck_7plus from '../Resources/deck_7+.png';
 import winnerGIF from '../Resources/winner.gif';
 
 import './styles.css';
