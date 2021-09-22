@@ -1,6 +1,6 @@
 .sender {
-    align-self: flex-start;
-    margin-left: 13%;
+    /* align-self: flex-start; */
+    margin-right: 3%;
 }
 
 .sender_bubble_component {
