@@ -139,7 +139,7 @@ const Game = ({
             const messageData = JSON.parse(event.data);
 
             if (!messageData.headers || !messageData.body) {
-                console.log("Unexpected message: ", messageData);
+                // console.log("Unexpected message: ", messageData);
                 return;
             };
 
@@ -225,7 +225,7 @@ const Game = ({
                         break;
                     };
                     case 'error_alert': {
-                        if (body.sent_to == currentUser.username) {
+                        if (body.sent_to == currentUser.username && deck.length <= 0) {
                             receiveChatMessage({
                                 type: 'text',
                                 sent_by: body.sent_by,
@@ -426,12 +426,36 @@ const Game = ({
                     <h2>Choose new color</h2>
                     <div className='container_change_color_buttons'>
                         <div style={{height: '50%', display: 'flex', justifyContent: 'center'}}>
-                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} className='btnChangeColorR'></button>
-                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} className='btnChangeColorB'></button>
+                            <button
+                                className='btnChangeColorR'
+                                onClick={() => {
+                                    changeColor('red');
+                                    closeModal();
+                                }}
+                            ></button>
+                            <button
+                                className='btnChangeColorB'
+                                onClick={() => {
+                                    changeColor('blue');
+                                    closeModal();
+                                }}
+                            ></button>
                         </div>
                         <div style={{height: '50%', display: 'flex', justifyContent: 'center'}}>
-                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} className='btnChangeColorY'></button>
-                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} className='btnChangeColorG'></button>
+                            <button
+                                className='btnChangeColorY'
+                                onClick={() => {
+                                    changeColor('yellow');
+                                    closeModal();
+                                }}
+                            ></button>
+                            <button
+                                className='btnChangeColorG'
+                                onClick={() => {
+                                    changeColor('green');
+                                    closeModal();
+                                }}
+                            ></button>
                         </div>
                     </div>
                 </Modal>
