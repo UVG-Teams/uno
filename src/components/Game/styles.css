@@ -75,3 +75,44 @@
     justify-content: center;
     align-items: center;
 }
+
+.container_change_color_buttons {
+    height: 70%;
+}
+
+
+.btnChangeColorR {
+    background-color:#ea323c;
+    color:white;
+    width: 25%;
+    height: 100%;
+    border-radius: 100px 0 0 0;
+    border: inherit;
+}
+
+.btnChangeColorB {
+    background-color:#0098dc;
+    color:white;
+    width: 25%;
+    height: 100%;
+    border-radius: 0 100px 0 0;
+    border: inherit;
+}
+
+.btnChangeColorY {
+    background-color:#ffc825;
+    color:white;
+    width: 25%;
+    height: 100%;
+    border-radius: 0 0 0 100px;
+    border: inherit;
+}
+
+.btnChangeColorG {
+    background-color:#33984b;
+    color:white;
+    width: 25%;
+    height: 100%;
+    border-radius: 0 0 100px 0;
+    border: inherit;
+}
