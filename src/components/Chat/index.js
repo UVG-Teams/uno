@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import { TextField, Button } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,7 +13,10 @@ import * as chatState from '../../reducers/chat';
 
 
 const Chat = ({ currentUser, chat_messages, sendMessage }) => {
-
+    const divRef = useRef(null);
+    useEffect(() => {
+        divRef.current.scrollIntoView({ behavior: 'smooth' });
+      });
     const [messageText, setMessageText] = useState('');
 
     return (
@@ -26,14 +29,16 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                     {
                         chat_messages.map(msg => {
                             const tag_key = `${msg.sent_by}-${msg.sent_at}-${msg.text}`
-
+                            
                             if (msg.sent_by != currentUser.username) {
                                 return <ReceiveBubble key={ tag_key } username={ msg.sent_by } text={ msg.text } />
                             } else {
                                 return <SendBubble key={ tag_key } text={ msg.text } />
                             }
                         })
+                        
                     }
+                    <div ref={divRef} />
                 </div>
                 <div className='chat_write_message'>
                     <input
