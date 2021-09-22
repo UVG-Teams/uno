@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import CryptoJS from 'crypto-js';
 import { connect } from 'react-redux';
 import { TextField, Button } from '@material-ui/core';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
@@ -15,6 +16,7 @@ import { text } from '@fortawesome/fontawesome-svg-core';
 
 const Chat = ({ currentUser, chat_messages, sendMessage }) => {
     const divRef = useRef(null);
+
     useEffect(() => {
         divRef.current.scrollIntoView({ behavior: 'smooth' });
     });
@@ -31,14 +33,14 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                     {
                         chat_messages.map(msg => {
                             const tag_key = `${msg.sent_by}-${msg.sent_at}-${msg.text}`
-                            
+
                             if (msg.sent_by != currentUser.username) {
                                 return <ReceiveBubble key={ tag_key } username={ msg.sent_by } text={ msg.text } />
                             } else {
                                 return <SendBubble key={ tag_key } text={ msg.text } />
                             }
                         })
-                        
+
                     }
                     <div ref={divRef} />
                 </div>
@@ -50,15 +52,15 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                         value={ messageText }
                         onChange={ e => setMessageText(e.target.value) }
                     />
-                    <button 
-                        className='btnMessage' 
+                    <button
+                        className='btnMessage'
                         onClick={() => {
                             sendMessage(messageText)
                             setMessageText('')
                         }}>
                         <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#ffffff' swapOpacity/>
                     </button>
-                     
+
                 </div>
             </div>
         </div>
@@ -82,7 +84,14 @@ export default connect(
                 sent_at: Date.now(),
             };
 
-            socket.send(JSON.stringify(message));
+            const headers = btoa(JSON.stringify({ roomCode: gameInfo.roomCode }));
+            const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(message), gameInfo.password).toString();
+
+            socket.send(JSON.stringify({
+                headers: headers,
+                body: ciphertext
+            }));
+
             dispatch(chatState.actions.sendMessage(message));
         }
     }),

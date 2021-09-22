@@ -49,7 +49,7 @@ const Login = ({ gameInfo, createGame, endgame, joinGame }) => {
                         label='Room Password'
                         className='login_inputs'
                         value={ password }
-                        type={ 'password' }
+                        // type={ 'password' }
                         onChange={ e => setPassword(e.target.value) }
                     />
                 </div>
