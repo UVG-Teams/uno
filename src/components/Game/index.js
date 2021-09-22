@@ -445,8 +445,8 @@ const Game = ({
                     contentLabel="Example Modal"
                     style={customStyles2}
                 >
-                    <div style={{}}>
-                        <label>"User" Won!</label>
+                    <div style={{position: 'relative', display: 'flex', flexDirection: 'column', alignItems:'center'}}>
+                        <h1 style={{position: 'absolute'}}>"User" Won!</h1>
                         <img src={ winnerGIF } className='winnerIMG'/>
                     </div>
                     
