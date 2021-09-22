@@ -8,13 +8,7 @@ import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
 import Modal from 'react-modal';
 
 import deck_1 from '../Resources/deck_1.png';
-import deck_2 from '../Resources/deck_2.png';
-import deck_3 from '../Resources/deck_3.png';
-import deck_4 from '../Resources/deck_4.png';
-import deck_5 from '../Resources/deck_5.png';
-import deck_6 from '../Resources/deck_6.png';
-import deck_7 from '../Resources/deck_7.png';
-import deck_7plus from '../Resources/deck_7+.png';
+import winnerGIF from '../Resources/winner.gif';
 
 import './styles.css';
 import Chat from '../Chat';
@@ -109,7 +103,18 @@ const Game = ({
           height: '40%',
           width: '25%',
         },
-      };
+    };
+
+    const customStyles2 = {
+        content: {
+          top: '50%',
+          left: '50%',
+          right: 'auto',
+          bottom: 'auto',
+          marginRight: '-50%',
+          transform: 'translate(-50%, -50%)',
+        },
+    };
 
     if (!gameInfo) {
         return <Redirect to='/' />
@@ -411,6 +416,7 @@ const Game = ({
                 </DragDropContext>
                 <Chat/>
             </div>
+            {/* Modal for change cards color */}
             <div>
                 <Modal
                     isOpen={modalIsOpen}
@@ -429,6 +435,21 @@ const Game = ({
                             <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} className='btnChangeColorG'></button>
                         </div>
                     </div>
+                </Modal>
+            </div>
+            {/* Modal when there is a winner */}
+            <div>
+                <Modal
+                    isOpen= {true}
+                    onRequestClose={closeModal}
+                    contentLabel="Example Modal"
+                    style={customStyles2}
+                >
+                    <div style={{}}>
+                        <label>"User" Won!</label>
+                        <img src={ winnerGIF } className='winnerIMG'/>
+                    </div>
+                    
                 </Modal>
             </div>
         </div>
