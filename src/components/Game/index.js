@@ -106,6 +106,8 @@ const Game = ({
           bottom: 'auto',
           marginRight: '-50%',
           transform: 'translate(-50%, -50%)',
+          height: '40%',
+          width: '25%',
         },
       };
 
@@ -416,11 +418,17 @@ const Game = ({
                     contentLabel="Example Modal"
                     style={customStyles}
                 >
-                    <h2>Elige color</h2>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
+                    <h2>Choose new color</h2>
+                    <div className='container_change_color_buttons'>
+                        <div style={{height: '50%', display: 'flex', justifyContent: 'center'}}>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} className='btnChangeColorR'></button>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} className='btnChangeColorB'></button>
+                        </div>
+                        <div style={{height: '50%', display: 'flex', justifyContent: 'center'}}>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} className='btnChangeColorY'></button>
+                            <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} className='btnChangeColorG'></button>
+                        </div>
+                    </div>
                 </Modal>
             </div>
         </div>
