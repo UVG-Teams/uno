@@ -9,6 +9,7 @@ import SendBubble from './Send_bubble';
 import * as selectors from '../../reducers';
 import ReceiveBubble from './Receive_bubble';
 import * as chatState from '../../reducers/chat';
+import { text } from '@fortawesome/fontawesome-svg-core';
 
 
 
@@ -16,7 +17,8 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
     const divRef = useRef(null);
     useEffect(() => {
         divRef.current.scrollIntoView({ behavior: 'smooth' });
-      });
+    });
+
     const [messageText, setMessageText] = useState('');
 
     return (
@@ -48,9 +50,15 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                         value={ messageText }
                         onChange={ e => setMessageText(e.target.value) }
                     />
-                    <button className='btnMessage' onClick={() => sendMessage(messageText)}>
+                    <button 
+                        className='btnMessage' 
+                        onClick={() => {
+                            sendMessage(messageText)
+                            setMessageText('')
+                        }}>
                         <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#ffffff' swapOpacity/>
                     </button>
+                     
                 </div>
             </div>
         </div>
@@ -76,6 +84,7 @@ export default connect(
 
             socket.send(JSON.stringify(message));
             dispatch(chatState.actions.sendMessage(message));
+            text.value = ""
         }
     }),
     (stateProps, dispatchProps, ownProps) => ({
