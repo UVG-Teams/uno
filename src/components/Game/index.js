@@ -172,6 +172,20 @@ const Game = ({
                         receiveCardMovement(body);
                         break;
                     };
+                    case 'uno_button_clicked': {
+                        const { sent_by } = messageData;
+                        const { username } = currentUser;
+                        if (sent_by === username) {
+                            if (myCards.length === 1) {
+                                // endgame(); TODO
+                            }
+                        } else {
+                            if (myCards.length === 1 && !currentUser.saidUNO) {
+                                takeCard();
+                                takeCard();
+                            }
+                        }
+                    }
                     case 'join_game': {
                         if (body.password == gameInfo.password) {
                             if (!players.map(player => player.username).includes(body.sent_by)) {
@@ -330,11 +344,11 @@ const Game = ({
 
     return (
         <div className='game_page'>
-            {/* <div className='room_name_background'>
+            <div className='room_name_background'>
                 <h1>
                     {gameInfo.roomCode}
                 </h1>
-            </div> */}
+            </div>
             <div style={{position: 'absolute'}}>
                 <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close

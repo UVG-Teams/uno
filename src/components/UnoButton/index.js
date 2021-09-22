@@ -20,18 +20,22 @@ export default connect(
   state => ({
     socket: selectors.getSocket(state),
     player: selectors.getCurrentUserInfo(state),
+    gameInfo: selectors.getGameInfo(state),
+    myCards: selectors.getMyCards(state),
+    deck: selectors.getDeck(state),
   }),
   dispatch => ({
-    onClick: (socket, player) => {
+    onClick: (socket, player, gameInfo, myCards, deck) => {
       socket.send(
         JSON.stringify({
-          type: 'UNO_BUTTON_CLICKED',
+          type: 'uno_button_clicked',
           sent_by: player.username,
+          roomCode: gameInfo.roomCode,
           sent_at: Date.now(),
         })
       );
       dispatch(actions.pressUno({
-        type: 'UNO_BUTTON_CLICKED',
+        type: 'uno_button_clicked',
         sent_by: player.username,
         sent_at: Date.now(),
       }));
@@ -39,18 +43,52 @@ export default connect(
       const message = {
         type: 'text',
         sent_by: player.username,
+        roomCode: gameInfo.roomCode,
         text: 'UNO!',
         sent_at: Date.now(),
     };
 
-    socket.send(JSON.stringify(message));
-    dispatch(chatActions.sendMessage(message));
-      console.log('UNO BUTTON CLICKED AND DATA SENT');
+      socket.send(JSON.stringify(message));
+      dispatch(chatActions.sendMessage(message));
+      
+      if (myCards.length !== 1) {
+        // Takes two cards from the deck
+        for (let i = 0; i<2; i++) {
+          const randomCard = deck.pop();
+          socket.send(
+            JSON.stringify({
+              type: 'game_move',
+              roomCode: gameInfo.roomCode,
+              sent_by: player.username,
+              moved_card: randomCard,
+              sent_at: Date.now(),
+              moved_to: player.username,
+            })
+          );
+          dispatch(actions.moveCard({
+            moved_by: player.username,
+            moved_card: randomCard,
+            moved_to: player.username,
+            moved_by_me: true
+          }));
+        }
+
+        const messageMistake = {
+          type: 'text',
+          sent_by: player.username,
+          roomCode: gameInfo.roomCode,
+          text: 'Sorry, I messed up! Already took my extra cards...',
+          sent_at: Date.now(),
+        };
+  
+        socket.send(JSON.stringify(messageMistake));
+        dispatch(chatActions.sendMessage(messageMistake));
+      }
     }
   }),
   (stateProps, dispatchProps) => ({
     onClick: () => {
-      dispatchProps.onClick(stateProps.socket, stateProps.player);
+      dispatchProps.onClick(stateProps.socket, stateProps.player, stateProps.gameInfo, stateProps.myCards, stateProps.deck);
     }
   })
 )(UnoButton);

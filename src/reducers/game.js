@@ -117,10 +117,27 @@ const gameInfo = (state = null, action) => {
     };
 };
 
-const currentUserInfo = (state = null, action) => {
+const currentUserInfo = (state = {saidUNO: false}, action) => {
     switch(action.type) {
         case types.CURRENT_USER_INFO_SETTED: {
-            return action.payload;
+            return {
+                ...state,
+                ...action.payload
+            };
+        };
+        case types.UNO_BUTTON_PRESSED: {
+            return {
+                ...state,
+                saidUNO: true,
+            }
+        };
+        case types.CARD_MOVED: {
+            const {payload} = action;
+            const newSaidUNO = payload.moved_to === state.username ? false : state.saidUNO;
+            return {
+                ...state,
+                saidUNO: newSaidUNO,
+            }
         };
         case types.CLOSE_GAME_COMPLETED: {
             return null;
