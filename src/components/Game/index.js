@@ -307,7 +307,6 @@ const Game = ({
 
         };
     };
-
     return (
         <div className='game_page'>
             <div style={{ position: 'absolute' }}>
@@ -417,10 +416,10 @@ const Game = ({
                     style={customStyles}
                 >
                     <h2>Elige color</h2>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
-                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
+                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'blue', 'azul'); closeModal();}} style={{backgroundColor:'blue', color:'white'}}>Azul</button>
+                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'red', 'rojo'); closeModal();}} style={{backgroundColor:'red', color:'white'}}>Rojo</button>
+                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'green', 'verde'); closeModal();}} style={{backgroundColor:'green', color:'white'}}>Verde</button>
+                    <button onClick={() => {changeColor(gameInfo, currentUser, socket, 'yellow', 'amarillo'); closeModal();}} style={{backgroundColor:'yellow'}}>Amarillo</button>
                 </Modal>
             </div>
         </div>
@@ -542,7 +541,7 @@ export default connect(
                 moved_card: randomCard,
             }));
         },
-        changeColor(gameInfo, currentUser, socket, color) {
+        changeColor(gameInfo, currentUser, socket, color, colorEsp=null) {
             socket.send(
                 JSON.stringify({
                     type: 'change_color',
@@ -551,10 +550,22 @@ export default connect(
                     color: color,
                 })
             );
+            if(color !== null){
+                socket.send(
+                    JSON.stringify({
+                        type: 'text',
+                        roomCode: gameInfo.roomCode,
+                        sent_by: currentUser.username,
+                        text: 'Cambie el color a ' + colorEsp,
+                        sent_at: Date.now(),
+                    })
+                )
+            }
 
             dispatch(gameState.actions.changeNewColor({
                 color: color,
             }))
+
         },
         receiveChangeColor(messageData) {
             dispatch(gameState.actions.changeNewColor({
