@@ -467,6 +467,33 @@ const Game = ({
                     
                 </Modal>
             </div>
+            {/* Modal start game */}
+            <div>
+                <Modal
+                    isOpen= {true}
+                    onRequestClose={closeModal}
+                    contentLabel="Example Modal"
+                    style={customStyles2}
+                >
+                    <div style={{display: 'flex', flexDirection: 'column', alignItems:'center'}}>
+                        <h1 >"User" Won!</h1>
+                        <label><b>Room code:</b> {gameInfo.roomCode}</label>
+                        <label><b>Connected players: </b>{players.map(player => (
+                            <div>
+                                {player.username}{"\n"}
+                            </div>
+                        ))}</label>
+                        <Button
+                            onClick={ () => endgame() }
+                            variant='contained'
+                            color='primary'
+                        >
+                            Start
+                        </Button>
+                    </div>
+                    
+                </Modal>
+            </div>
         </div>
     );
 };
@@ -485,8 +512,8 @@ export default connect(
     dispatch => ({
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
-                // url: 'ws://localhost:8080'
-                url: 'ws://18.135.12.10:8080'
+                url: 'ws://localhost:8080'
+                // url: 'ws://18.135.12.10:8080'
             }));
         },
         endgame() {
