@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import CryptoJS from 'crypto-js';
 import { connect } from 'react-redux';
 import { TextField, Button } from '@material-ui/core';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
@@ -9,10 +10,16 @@ import SendBubble from './Send_bubble';
 import * as selectors from '../../reducers';
 import ReceiveBubble from './Receive_bubble';
 import * as chatState from '../../reducers/chat';
+import { text } from '@fortawesome/fontawesome-svg-core';
 
 
 
 const Chat = ({ currentUser, chat_messages, sendMessage }) => {
+    const divRef = useRef(null);
+
+    useEffect(() => {
+        divRef.current.scrollIntoView({ behavior: 'smooth' });
+    });
 
     const [messageText, setMessageText] = useState('');
 
@@ -33,7 +40,9 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                                 return <SendBubble key={ tag_key } text={ msg.text } />
                             }
                         })
+
                     }
+                    <div ref={divRef} />
                 </div>
                 <div className='chat_write_message'>
                     <input
@@ -43,9 +52,15 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                         value={ messageText }
                         onChange={ e => setMessageText(e.target.value) }
                     />
-                    <button className='btnMessage' onClick={() => sendMessage(messageText)}>
+                    <button
+                        className='btnMessage'
+                        onClick={() => {
+                            sendMessage(messageText)
+                            setMessageText('')
+                        }}>
                         <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#ffffff' swapOpacity/>
                     </button>
+
                 </div>
             </div>
         </div>
@@ -69,7 +84,14 @@ export default connect(
                 sent_at: Date.now(),
             };
 
-            socket.send(JSON.stringify(message));
+            const headers = btoa(JSON.stringify({ roomCode: gameInfo.roomCode }));
+            const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(message), gameInfo.password).toString();
+
+            socket.send(JSON.stringify({
+                headers: headers,
+                body: ciphertext
+            }));
+
             dispatch(chatState.actions.sendMessage(message));
         }
     }),

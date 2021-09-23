@@ -8,6 +8,23 @@
     position: relative;
 }
 
+.room_name_background {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none !important;
+}
+
+.room_name_background h1 {
+    color: white;
+    font-size: 40px;
+    text-align: center;
+    vertical-align: middle;
+    letter-spacing: 1px;
+}
+
 .dnd {
     /* background-color: yellowgreen; */
     height: 100%;
@@ -81,4 +98,50 @@
     display: flex;
     flex-direction: row;
     left: 45%;
+}
+
+.container_change_color_buttons {
+    height: 70%;
+}
+
+
+.btnChangeColorR {
+    background-color:#ea323c;
+    color:white;
+    width: 25%;
+    height: 100%;
+    border-radius: 100px 0 0 0;
+    border: inherit;
+}
+
+.btnChangeColorB {
+    background-color:#0098dc;
+    color:white;
+    width: 25%;
+    height: 100%;
+    border-radius: 0 100px 0 0;
+    border: inherit;
+}
+
+.btnChangeColorY {
+    background-color:#ffc825;
+    color:white;
+    width: 25%;
+    height: 100%;
+    border-radius: 0 0 0 100px;
+    border: inherit;
+}
+
+.btnChangeColorG {
+    background-color:#33984b;
+    color:white;
+    width: 25%;
+    height: 100%;
+    border-radius: 0 0 100px 0;
+    border: inherit;
+}
+
+.winnerIMG {
+    /* width: 13vw;
+    height: 32vh; */
 }
