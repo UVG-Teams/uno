@@ -536,8 +536,8 @@ export default connect(
     dispatch => ({
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
-                url: 'ws://localhost:8080',
-                // url: 'ws://18.135.12.10:8080',
+                // url: 'ws://localhost:8080',
+                url: 'ws://18.135.12.10:8080',
             }));
         },
         socket_send(gameInfo, socket, messageData) {
