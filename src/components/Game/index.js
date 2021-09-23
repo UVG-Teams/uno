@@ -480,19 +480,34 @@ const Game = ({
                     style={customStyles2}
                 >
                     <div style={{display: 'flex'}}>
-                        <div style={{width: '30vh', display: 'flex', flexDirection: 'column'}}>
+                        <div style={{width: '25vh', display: 'flex', flexDirection: 'column'}}>
                             <h1 style={{textAlign: 'center'}}>UNO</h1>
                             <label><b>Room code:</b> {gameInfo.roomCode}</label>
                             <div style={{display: 'flex', marginBottom: '5%'}}>
                                 <label><b>Connected players: </b>{players.map(player => (<div style={{textAlign:'center'}}>{player.username}{"\n"}</div>))}</label>
                             </div>
-                            <Button
-                                onClick={ () => endgame() }
-                                variant='contained'
-                                color='primary'
-                            >
-                                Start
-                            </Button>
+                            {/* <label>{players.length<3 ? 'No se puede jugar' : 'Juguemos'}</label> */}
+                            {players.length<3 ? (
+                                <>
+                                    <label>There must be at least 3 players connected</label>
+                                    <Button
+                                        onClick={ () => endgame() }
+                                        variant='contained'
+                                        color='primary'
+                                        disabled
+                                    >
+                                        Start
+                                    </Button>
+                                </>
+                            ) : (                           
+                                <Button
+                                    onClick={ () => endgame() }
+                                    variant='contained'
+                                    color='primary'
+                                >
+                                    Start
+                                </Button>
+                            )}
                         </div>
                         <div>
                             <img src={ startGame3 } style={{height: '40vh'}}/>
