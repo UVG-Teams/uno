@@ -85,6 +85,10 @@ const Game = ({
     changeTurn,
     receiveChangeTurn,
     takeXCards,
+    reverseTurns,
+    receiveReverse,
+    turnsList,
+    reverse,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -154,6 +158,7 @@ const Game = ({
                     case 'join_game': {
                         if (messageData.password == gameInfo.password) {
                             if (!players.map(player => player.username).includes(messageData.sent_by)) {
+                                console.log(messageData.sent_by)
                                 receiveNewUser(messageData);
                                 receiveChatMessage(messageData);
 
@@ -223,6 +228,7 @@ const Game = ({
                     };
                     case 'change_turn': {
                         receiveChangeTurn(messageData);
+                        break;
                     };
                     case 'take_x_cards': {
                         if(messageData.take == currentUser.username) {
@@ -230,7 +236,12 @@ const Game = ({
                                 takeCard();
                             }
                         }
-                    }
+                        break;
+                    };
+                    case 'reverse_turn': {
+                        receiveReverse(messageData);
+                        break
+                    };
                     case 'error_alert': {
                         if (messageData.sent_to == currentUser.username) {
                             receiveChatMessage({
@@ -318,16 +329,19 @@ const Game = ({
             moveMyCard(currentUser.username, moved_card, 'currentPlayedCard');
             
             if( moved_card_number == 'skip') {
-                changeTurn(gameInfo, currentUser, socket, 2)
+                changeTurn(gameInfo, currentUser, socket, 2, reverse)
             }else if(moved_card_number == 'draw' & moved_card_color !== 'wild') {
                 takeXCards(gameInfo, currentUser, socket, players, turns, 2)
-                changeTurn(gameInfo, currentUser, socket, 2)
+                changeTurn(gameInfo, currentUser, socket, 2, reverse)
             }else if(moved_card_number == 'draw' & moved_card_color == 'wild') {
                 takeXCards(gameInfo, currentUser, socket, players, turns, 4)
-                changeTurn(gameInfo, currentUser, socket, 2)
+                changeTurn(gameInfo, currentUser, socket, 2, reverse)
+            }else if(moved_card_number == 'reverse' & moved_card_color !=='wild') {
+                reverseTurns(gameInfo, currentUser, socket);
+                changeTurn(gameInfo, currentUser, socket, 1, !reverse)
             }
             else {
-                changeTurn(gameInfo, currentUser, socket, 1)
+                changeTurn(gameInfo, currentUser, socket, 1, reverse)
             }
 
             if (moved_card_color == 'wild') {
@@ -336,8 +350,6 @@ const Game = ({
 
         };
     };
-    console.log(turns)
-    console.log(players.length)
     return (
         <div className='game_page'>
             <div style={{ position: 'absolute' }}>
@@ -347,7 +359,7 @@ const Game = ({
             </div>
             <div className='turns'>
                 <h2 style={{paddingRight:5}}>Turno de:  </h2>
-                <h2>{`${players[turns%players.length]!==undefined ? players[turns%players.length].username : ''}`}</h2>
+                <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2>
             </div>
             <div className='dnd'>
                 {
@@ -406,7 +418,7 @@ const Game = ({
                         <div className='table_deck_droppable'>
                             {
                                 deck.length > 0 ? (
-                                    <Button onClick={() => {takeCard(); changeTurn(gameInfo, currentUser, socket, 1);}}>
+                                    <Button onClick={() => {takeCard(); changeTurn(gameInfo, currentUser, socket, 1, reverse);}}>
                                         <img src={ deck_1 } className='take_card'/>
                                     </Button>
                                 ) : (<></>)
@@ -472,6 +484,8 @@ export default connect(
         deck: selectors.getGameDeck(state),
         changedColor: selectors.getChangedColor(state),
         turns: selectors.getTurns(state),
+        turnsList: selectors.getTurnsList(state),
+        reverse: selectors.getReverse(state),
     }),
     dispatch => ({
         connectWS() {
@@ -531,10 +545,9 @@ export default connect(
                 moved_by_me: true
             }));
         },
-        sendNewUserCurrentGameState(currentUser, socket, gameInfo, currentPlayedCard, players, deck, new_username, turns) {
+        sendNewUserCurrentGameState(currentUser, socket, gameInfo, currentPlayedCard, players, deck, new_username, turns, turnsList) {
 
             if (players.map(player => player.username).includes(new_username)) {
-                console.log('players', players);
             } else {
                 players.push({
                     username: new_username,
@@ -552,6 +565,7 @@ export default connect(
                     players: players,
                     deck: deck,
                     turns: turns,
+                    turnsList: turnsList,
                     sent_to: new_username,
                     text: `Bienvenido ${new_username}`,
                     sent_at: Date.now(),
@@ -612,7 +626,10 @@ export default connect(
                 color: messageData.color,
             }))
         },
-        changeTurn(gameInfo, currentUser, socket, turns) {
+        changeTurn(gameInfo, currentUser, socket, turns, reverse) {
+            if(reverse){
+                turns = turns * (-1);
+            }
             socket.send(
                 JSON.stringify({
                     type: 'change_turn',
@@ -637,6 +654,19 @@ export default connect(
                 })
             )
         },
+        reverseTurns(gameInfo, currentUser, socket) {
+            socket.send(
+                JSON.stringify({
+                    type: 'reverse_turn',
+                    roomCode: gameInfo.roomCode,
+                    sent_by: currentUser.username,
+                })
+            )
+            dispatch(gameState.actions.playReverse());
+        },
+        receiveReverse(messageData){
+            dispatch(gameState.actions.playReverse());
+        },
     }),
     (stateProps, dispatchProps, ownProps) => ({
         ...ownProps,
@@ -655,10 +685,11 @@ export default connect(
                 stateProps.deck,
                 messageData.sent_by,
                 stateProps.turns,
+                stateProps.turnsList,
             );
         },
         setRandomInitialCard() {
             dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
-        }
+        },
     })
 )(Game);

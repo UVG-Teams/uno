@@ -22,6 +22,7 @@ export const types = {
     NEW_COLOR_PLAYED: 'NEW_COLOR_PLAYED',
     TURN_CHANGED: 'TURN_CHANGED',
     TURNS_RECEIVED: 'TURNS_RECEIVED',
+    REVERSE_PLAYED: 'REVERSE_PLAYED',
 };
 
 export const actions = {
@@ -86,6 +87,9 @@ export const actions = {
     setTurns: turn  => ({
         type: types.TURNS_RECEIVED,
         payload: turn
+    }),
+    playReverse: ()  => ({
+        type: types.REVERSE_PLAYED,
     }),
 };
 
@@ -329,6 +333,56 @@ const turns = (state = 0, action) => {
     }
 }
 
+const turnsList = (state = [], action) => {
+    switch(action.type) {
+        case types.ONLINE_PLAYERS_RECEIVED: {
+            return action.payload;
+        };
+        case types.CREATE_GAME_STARTED: {
+            return [{
+                username: action.payload.roomOwner,
+                cards: 0,
+            }]
+        };
+        case types.NEW_USER_RECEIVED: {
+            return [
+                ...state,
+                {
+                    username: action.payload.username,
+                    cards: 0,
+                }
+            ];
+        };
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
+        case types.PLAYER_REMOVED: {
+            const newState = [];
+
+            state.map(player => {
+                if (player.username != action.payload) {
+                    newState.push(player);
+                };
+            });
+
+            return newState;
+        };
+        // case types.REVERSE_PLAYED: {
+        //     return state.reverse();
+        // };
+        default: return state;
+    };
+}
+
+const reverse = (state = false, action) => {
+    switch(action.type) {
+        case types.REVERSE_PLAYED: {
+            return !state;
+        };
+        default: return state;
+    }
+}
+
 export default combineReducers({
     gameInfo,
     currentUserInfo,
@@ -338,6 +392,8 @@ export default combineReducers({
     deck,
     changedColor,
     turns,
+    turnsList,
+    reverse,
 });
 
 export const getGameInfo = state => state.gameInfo;
@@ -348,3 +404,5 @@ export const getPlayers = state => state.players;
 export const getDeck = state => state.deck;
 export const getChangedColor = state => state.changedColor;
 export const getTurns = state => state.turns;
+export const getTurnsList = state => state.turnsList;
+export const getReverse = state => state.reverse;
