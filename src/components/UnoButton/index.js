@@ -25,15 +25,23 @@ export default connect(
     gameInfo: selectors.getGameInfo(state),
     myCards: selectors.getMyCards(state),
     deck: selectors.getGameDeck(state),
+    players: selectors.getPlayers(state),
   }),
   dispatch => ({
-    onClick: (socket, player, gameInfo, myCards, deck) => {
-      socket.send(
-        JSON.stringify({
-          type: 'uno_button_clicked',
+    onClick: (socket, player, gameInfo, myCards, deck, players) => {
+      const tmessage = {
+        type: 'uno_button_clicked',
           sent_by: player.username,
           roomCode: gameInfo.roomCode,
           sent_at: Date.now(),
+      }
+      const headers = btoa(JSON.stringify({ roomCode: gameInfo.roomCode }));
+      const ciphertextClick = CryptoJS.AES.encrypt(JSON.stringify(tmessage), gameInfo.password).toString();
+
+      socket.send(
+        JSON.stringify({
+          headers,
+          body: ciphertextClick,
         })
       );
       dispatch(actions.pressUno({
@@ -48,12 +56,18 @@ export default connect(
         roomCode: gameInfo.roomCode,
         text: 'UNO!',
         sent_at: Date.now(),
-    };
+      };
 
-      socket.send(JSON.stringify(message));
+      const cipherTextMessage = CryptoJS.AES.encrypt(JSON.stringify(message), gameInfo.password).toString();
+
+      socket.send(JSON.stringify({
+        headers,
+        body: cipherTextMessage,
+      }));
       dispatch(chatActions.sendMessage(message));
-      
-      if (myCards.length !== 1 && !player.saidUno) {
+      const someoneElseHasUno = players.reduce((accumulator, currentPlayer) => accumulator || currentPlayer.cards===1, false);
+      console.log(someoneElseHasUno);
+      if (myCards.length !== 1 && !player.saidUno && !someoneElseHasUno) {
         // Takes two cards from the deck
         const headers = btoa(JSON.stringify({ roomCode: gameInfo.roomCode }));
         for (let i = 0; i<2; i++) {
@@ -104,7 +118,7 @@ export default connect(
   }),
   (stateProps, dispatchProps) => ({
     onClick: () => {
-      dispatchProps.onClick(stateProps.socket, stateProps.player, stateProps.gameInfo, stateProps.myCards, stateProps.deck);
+      dispatchProps.onClick(stateProps.socket, stateProps.player, stateProps.gameInfo, stateProps.myCards, stateProps.deck, stateProps.players );
     }
   })
 )(UnoButton);
