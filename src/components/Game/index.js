@@ -16,6 +16,10 @@ import deck_6 from '../Resources/deck_6.png';
 import deck_7 from '../Resources/deck_7.png';
 import deck_7plus from '../Resources/deck_7+.png';
 import winnerGIF from '../Resources/winner.gif';
+import startGame from '../Resources/startGame.png';
+import startGame2 from '../Resources/startgame.webp';
+import startGame3 from '../Resources/start_game.png';
+
 
 import './styles.css';
 import Chat from '../Chat';
@@ -475,21 +479,24 @@ const Game = ({
                     contentLabel="Example Modal"
                     style={customStyles2}
                 >
-                    <div style={{display: 'flex', flexDirection: 'column', alignItems:'center'}}>
-                        <h1 >"User" Won!</h1>
-                        <label><b>Room code:</b> {gameInfo.roomCode}</label>
-                        <label><b>Connected players: </b>{players.map(player => (
-                            <div>
-                                {player.username}{"\n"}
+                    <div style={{display: 'flex'}}>
+                        <div style={{width: '30vh', display: 'flex', flexDirection: 'column'}}>
+                            <h1 style={{textAlign: 'center'}}>UNO</h1>
+                            <label><b>Room code:</b> {gameInfo.roomCode}</label>
+                            <div style={{display: 'flex', marginBottom: '5%'}}>
+                                <label><b>Connected players: </b>{players.map(player => (<div style={{textAlign:'center'}}>{player.username}{"\n"}</div>))}</label>
                             </div>
-                        ))}</label>
-                        <Button
-                            onClick={ () => endgame() }
-                            variant='contained'
-                            color='primary'
-                        >
-                            Start
-                        </Button>
+                            <Button
+                                onClick={ () => endgame() }
+                                variant='contained'
+                                color='primary'
+                            >
+                                Start
+                            </Button>
+                        </div>
+                        <div>
+                            <img src={ startGame3 } style={{height: '40vh'}}/>
+                        </div>
                     </div>
                     
                 </Modal>
