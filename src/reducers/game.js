@@ -20,6 +20,8 @@ export const types = {
     GAME_INFO_RECEIVED: 'GAME_INFO_RECEIVED',
     NEW_COLOR_CHANGED: 'NEW_COLOR_CHANGED',
     NEW_COLOR_PLAYED: 'NEW_COLOR_PLAYED',
+    TURN_CHANGED: 'TURN_CHANGED',
+    TURNS_RECEIVED: 'TURNS_RECEIVED',
 };
 
 export const actions = {
@@ -76,6 +78,14 @@ export const actions = {
     changeNewColor: color => ({
         type: types.NEW_COLOR_CHANGED,
         payload: color,
+    }),
+    changeTurn: turns => ({
+        type: types.TURN_CHANGED,
+        payload: turns,
+    }),
+    setTurns: turn  => ({
+        type: types.TURNS_RECEIVED,
+        payload: turn
     }),
 };
 
@@ -304,6 +314,21 @@ const changedColor = (state = null, action) => {
     }
 }
 
+const turns = (state = 0, action) => {
+    switch(action.type) {
+        case types.CREATE_GAME_STARTED: {
+            return 0
+        }
+        case types.TURN_CHANGED: {
+            return state = state + action.payload;
+        }
+        case types.TURNS_RECEIVED: {
+            return action.payload;
+        }
+        default: return state;
+    }
+}
+
 export default combineReducers({
     gameInfo,
     currentUserInfo,
@@ -312,6 +337,7 @@ export default combineReducers({
     currentPlayedCard,
     deck,
     changedColor,
+    turns,
 });
 
 export const getGameInfo = state => state.gameInfo;
@@ -321,3 +347,4 @@ export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
 export const getDeck = state => state.deck;
 export const getChangedColor = state => state.changedColor;
+export const getTurns = state => state.turns;

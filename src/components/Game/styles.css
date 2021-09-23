@@ -75,3 +75,10 @@
     justify-content: center;
     align-items: center;
 }
+
+.turns{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    left: 45%;
+}

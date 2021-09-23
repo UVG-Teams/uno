@@ -20,9 +20,9 @@ import './styles.css';
 import Chat from '../Chat';
 
 import * as selectors from '../../reducers';
-import * as gameState from '../../reducers/game';
+import game, * as gameState from '../../reducers/game';
 import * as chatState from '../../reducers/chat';
-import * as socketState from '../../reducers/socket';
+import socket, * as socketState from '../../reducers/socket';
 import { counter } from '@fortawesome/fontawesome-svg-core';
 
 
@@ -80,6 +80,11 @@ const Game = ({
     setRandomInitialCard,
     changedColor,
     receiveChangeColor,
+    turns,
+    setTurns,
+    changeTurn,
+    receiveChangeTurn,
+    takeXCards,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -208,6 +213,7 @@ const Game = ({
                             setInitialPlayedCard(messageData);
                             setOnlinePlayers(messageData);
                             setGameInfo(messageData);
+                            setTurns(messageData);
                         };
                         break;
                     };
@@ -215,6 +221,16 @@ const Game = ({
                         receiveChangeColor(messageData);
                         break;
                     };
+                    case 'change_turn': {
+                        receiveChangeTurn(messageData);
+                    };
+                    case 'take_x_cards': {
+                        if(messageData.take == currentUser.username) {
+                            for (let i = 0; i< messageData.number; i++){
+                                takeCard();
+                            }
+                        }
+                    }
                     case 'error_alert': {
                         if (messageData.sent_to == currentUser.username) {
                             receiveChatMessage({
@@ -300,6 +316,19 @@ const Game = ({
             );
 
             moveMyCard(currentUser.username, moved_card, 'currentPlayedCard');
+            
+            if( moved_card_number == 'skip') {
+                changeTurn(gameInfo, currentUser, socket, 2)
+            }else if(moved_card_number == 'draw' & moved_card_color !== 'wild') {
+                takeXCards(gameInfo, currentUser, socket, players, turns, 2)
+                changeTurn(gameInfo, currentUser, socket, 2)
+            }else if(moved_card_number == 'draw' & moved_card_color == 'wild') {
+                takeXCards(gameInfo, currentUser, socket, players, turns, 4)
+                changeTurn(gameInfo, currentUser, socket, 2)
+            }
+            else {
+                changeTurn(gameInfo, currentUser, socket, 1)
+            }
 
             if (moved_card_color == 'wild') {
                 openModal();
@@ -307,12 +336,18 @@ const Game = ({
 
         };
     };
+    console.log(turns)
+    console.log(players.length)
     return (
         <div className='game_page'>
             <div style={{ position: 'absolute' }}>
                 <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close
                 </Button>
+            </div>
+            <div className='turns'>
+                <h2 style={{paddingRight:5}}>Turno de:  </h2>
+                <h2>{`${players[turns%players.length]!==undefined ? players[turns%players.length].username : ''}`}</h2>
             </div>
             <div className='dnd'>
                 {
@@ -371,7 +406,7 @@ const Game = ({
                         <div className='table_deck_droppable'>
                             {
                                 deck.length > 0 ? (
-                                    <Button onClick={() => takeCard()}>
+                                    <Button onClick={() => {takeCard(); changeTurn(gameInfo, currentUser, socket, 1);}}>
                                         <img src={ deck_1 } className='take_card'/>
                                     </Button>
                                 ) : (<></>)
@@ -436,6 +471,7 @@ export default connect(
         players: selectors.getPlayers(state),
         deck: selectors.getGameDeck(state),
         changedColor: selectors.getChangedColor(state),
+        turns: selectors.getTurns(state),
     }),
     dispatch => ({
         connectWS() {
@@ -495,7 +531,7 @@ export default connect(
                 moved_by_me: true
             }));
         },
-        sendNewUserCurrentGameState(currentUser, socket, gameInfo, currentPlayedCard, players, deck, new_username) {
+        sendNewUserCurrentGameState(currentUser, socket, gameInfo, currentPlayedCard, players, deck, new_username, turns) {
 
             if (players.map(player => player.username).includes(new_username)) {
                 console.log('players', players);
@@ -515,6 +551,7 @@ export default connect(
                     current_played_card: currentPlayedCard,
                     players: players,
                     deck: deck,
+                    turns: turns,
                     sent_to: new_username,
                     text: `Bienvenido ${new_username}`,
                     sent_at: Date.now(),
@@ -532,6 +569,9 @@ export default connect(
         },
         setGameInfo(messageData) {
             dispatch(gameState.actions.setGameInfo(messageData.game_info));
+        },
+        setTurns(messageData) {
+            dispatch(gameState.actions.setTurns(messageData.turns));
         },
         setRandomInitialCard(currentUser, deck, socket) {
             const randomCard = deck.pop();
@@ -572,6 +612,31 @@ export default connect(
                 color: messageData.color,
             }))
         },
+        changeTurn(gameInfo, currentUser, socket, turns) {
+            socket.send(
+                JSON.stringify({
+                    type: 'change_turn',
+                    roomCode: gameInfo.roomCode,
+                    sent_by: currentUser.username,
+                    turns: turns,
+                })
+            )
+            dispatch(gameState.actions.changeTurn(turns))
+        },
+        receiveChangeTurn(messageData) {
+            dispatch(gameState.actions.changeTurn(messageData.turns))
+        },
+        takeXCards(gameInfo, currentUser, socket, players, turns, cardsNumber) {
+            socket.send(
+                JSON.stringify({
+                    type: 'take_x_cards',
+                    roomCode: gameInfo.roomCode,
+                    sent_by: currentUser.username,
+                    take: players[(turns+1)%players.length].username,
+                    number: cardsNumber,
+                })
+            )
+        },
     }),
     (stateProps, dispatchProps, ownProps) => ({
         ...ownProps,
@@ -589,6 +654,7 @@ export default connect(
                 stateProps.players,
                 stateProps.deck,
                 messageData.sent_by,
+                stateProps.turns,
             );
         },
         setRandomInitialCard() {
