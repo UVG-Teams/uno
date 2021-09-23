@@ -84,6 +84,7 @@ const Game = ({
     changedColor,
     receiveChangeColor,
     socket_send,
+    changeMatchState,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -186,6 +187,7 @@ const Game = ({
                                 takeCard();
                             }
                         }
+                        break;
                     }
                     case 'join_game': {
                         if (body.password == gameInfo.password) {
@@ -343,6 +345,20 @@ const Game = ({
         };
     };
 
+    const parseGameState = (prop) => {
+        if (currentUser.username === gameInfo.roomOwner) {
+            if (prop === gameState.GAME_STATES.ROOM_CREATED) {
+                return 'Comenzar'
+            } else if (prop === gameState.GAME_STATES.PLAYING) {
+                return 'Terminar juego'
+            } else {
+                return ''
+            }
+        } else {
+            return 'Salir'
+        }
+    }
+
     return (
         <div className='game_page'>
             <div className='room_name_background'>
@@ -351,10 +367,15 @@ const Game = ({
                 </h1>
             </div>
             <div style={{position: 'absolute'}}>
-                <Button onClick={() => endgame()} variant='contained' color='primary'>
-                    Close
+                <Button onClick={() => changeMatchState()} variant='contained' color='primary'>
+                    {parseGameState(gameInfo.gameState)}
                 </Button>
             </div>
+            {/* <div style={{position: 'absolute', top: '50px'}}>
+                <Button onClick={changeMatchState} variant='contained' color='secondary'>
+                    {parseGameState(gameInfo.gameState)}
+                </Button>
+            </div> */}
             <div className='dnd'>
                 {
                     players.filter(player => player.username != currentUser.username)
@@ -660,6 +681,17 @@ export default connect(
                 color: messageData.color,
             }))
         },
+        changeMatchState(currentUser, gameInfo, propState){
+            if (currentUser.username === gameInfo.roomOwner) {
+                if (propState.gameState === gameState.GAME_STATES.ROOM_CREATED) {
+                    dispatch(gameState.actions.startGame());
+                } else if (propState.gameState === gameState.GAME_STATES.PLAYING|| propState.gameState === gameState.GAME_STATES.WON) {
+                    dispatch(gameState.actions.startClosingGame());
+                }
+            } else {
+                // SALIR DE LA SALA
+            }
+        }
     }),
     (stateProps, dispatchProps, ownProps) => ({
         ...ownProps,
@@ -685,6 +717,9 @@ export default connect(
         },
         changeColor(color) {
             dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color)
+        },
+        changeMatchState(){
+            dispatchProps.changeMatchState(stateProps.gameInfo);
         }
     })
 )(Game);

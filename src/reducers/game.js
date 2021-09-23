@@ -21,6 +21,9 @@ export const types = {
     NEW_COLOR_CHANGED: 'NEW_COLOR_CHANGED',
     NEW_COLOR_PLAYED: 'NEW_COLOR_PLAYED',
     UNO_BUTTON_PRESSED: 'UNO_BUTTON_PRESSED',
+    GAME_STARTED: 'GAME_STARTED',
+    GAME_ENDED: 'GAME_ENDED',
+    GAME_WON: 'GAME_WON',
     // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
     // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
     // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
@@ -84,7 +87,19 @@ export const actions = {
     pressUno: payload => ({
         type: types.UNO_BUTTON_PRESSED,
         payload,
-    })
+    }),
+    startGame: payload => ({
+        type: types.GAME_STARTED,
+        payload,
+    }),
+    endGame: payload => ({
+        type: types.GAME_ENDED,
+        payload,
+    }),
+    winGame: payload => ({
+        type: types.GAME_WON,
+        payload,
+    }),
     // startJoiningGame: () => ({
     //     type: types.JOIN_GAME_STARTED,
     //     payload: null
@@ -99,20 +114,48 @@ export const actions = {
     // }),
 };
 
+export const GAME_STATES = {
+    ROOM_CREATED: 'ROOM_CREATED',
+    PLAYING: 'PLAYING',
+    ENDED: 'ENDED',
+    WON: 'WON',
+}
+
 const gameInfo = (state = null, action) => {
     switch(action.type) {
         case types.GAME_INFO_RECEIVED: {
             return action.payload;
-        };
+        }
         case types.CREATE_GAME_STARTED: {
-            return action.payload;
-        };
+            return {
+                ...action.payload,
+                gameState: GAME_STATES.ROOM_CREATED,
+            };
+        }
         case types.JOIN_GAME_STARTED: {
             return action.payload;
-        };
+        }
         case types.CLOSE_GAME_COMPLETED: {
             return null;
-        };
+        }
+        case types.GAME_STARTED: {
+            return {
+                ...state,
+                gameState: GAME_STATES.PLAYING,
+            }
+        }
+        case types.GAME_ENDED: {
+            return {
+                ...state,
+                gameState: GAME_STATES.ENDED,
+            }
+        }
+        case types.GAME_WON: {
+            return {
+                ...state,
+                gameState: GAME_STATES.WON,
+            }
+        }
         default: return state;
     };
 };
@@ -358,3 +401,4 @@ export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
 export const getDeck = state => state.deck;
 export const getChangedColor = state => state.changedColor;
+export const getGameState = state => state.gameInfo.gameState;
