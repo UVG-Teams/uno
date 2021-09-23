@@ -20,10 +20,10 @@ export const types = {
     GAME_INFO_RECEIVED: 'GAME_INFO_RECEIVED',
     NEW_COLOR_CHANGED: 'NEW_COLOR_CHANGED',
     NEW_COLOR_PLAYED: 'NEW_COLOR_PLAYED',
+    TURN_CHANGED: 'TURN_CHANGED',
+    TURNS_RECEIVED: 'TURNS_RECEIVED',
+    REVERSE_PLAYED: 'REVERSE_PLAYED',
     UNO_BUTTON_PRESSED: 'UNO_BUTTON_PRESSED',
-    // JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
-    // JOIN_GAME_COMPLETED: 'JOIN_GAME_COMPLETED',
-    // JOIN_GAME_FAILED: 'JOIN_GAME_FAILED',
 };
 
 export const actions = {
@@ -81,22 +81,21 @@ export const actions = {
         type: types.NEW_COLOR_CHANGED,
         payload: color,
     }),
+    changeTurn: turns => ({
+        type: types.TURN_CHANGED,
+        payload: turns,
+    }),
+    setTurns: turn  => ({
+        type: types.TURNS_RECEIVED,
+        payload: turn
+    }),
+    playReverse: ()  => ({
+        type: types.REVERSE_PLAYED,
+    }),
     pressUno: payload => ({
         type: types.UNO_BUTTON_PRESSED,
         payload,
-    })
-    // startJoiningGame: () => ({
-    //     type: types.JOIN_GAME_STARTED,
-    //     payload: null
-    // }),
-    // completeJoiningGame: () => ({
-    //     type: types.JOIN_GAME_COMPLETED,
-    //     payload: null
-    // }),
-    // failJoiningGame: error => ({
-    //     type: types.JOIN_GAME_FAILED,
-    //     payload: { error }
-    // }),
+    }),
 };
 
 const gameInfo = (state = null, action) => {
@@ -341,6 +340,71 @@ const changedColor = (state = null, action) => {
     }
 }
 
+const turns = (state = 0, action) => {
+    switch(action.type) {
+        case types.CREATE_GAME_STARTED: {
+            return 0
+        }
+        case types.TURN_CHANGED: {
+            return state = state + action.payload;
+        }
+        case types.TURNS_RECEIVED: {
+            return action.payload;
+        }
+        default: return state;
+    }
+}
+
+const turnsList = (state = [], action) => {
+    switch(action.type) {
+        case types.ONLINE_PLAYERS_RECEIVED: {
+            return action.payload;
+        };
+        case types.CREATE_GAME_STARTED: {
+            return [{
+                username: action.payload.roomOwner,
+                cards: 0,
+            }]
+        };
+        case types.NEW_USER_RECEIVED: {
+            return [
+                ...state,
+                {
+                    username: action.payload.username,
+                    cards: 0,
+                }
+            ];
+        };
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
+        case types.PLAYER_REMOVED: {
+            const newState = [];
+
+            state.map(player => {
+                if (player.username != action.payload) {
+                    newState.push(player);
+                };
+            });
+
+            return newState;
+        };
+        // case types.REVERSE_PLAYED: {
+        //     return state.reverse();
+        // };
+        default: return state;
+    };
+}
+
+const reverse = (state = false, action) => {
+    switch(action.type) {
+        case types.REVERSE_PLAYED: {
+            return !state;
+        };
+        default: return state;
+    }
+}
+
 export default combineReducers({
     gameInfo,
     currentUserInfo,
@@ -349,6 +413,9 @@ export default combineReducers({
     currentPlayedCard,
     deck,
     changedColor,
+    turns,
+    turnsList,
+    reverse,
 });
 
 export const getGameInfo = state => state.gameInfo;
@@ -358,3 +425,6 @@ export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
 export const getDeck = state => state.deck;
 export const getChangedColor = state => state.changedColor;
+export const getTurns = state => state.turns;
+export const getTurnsList = state => state.turnsList;
+export const getReverse = state => state.reverse;
