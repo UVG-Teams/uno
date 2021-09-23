@@ -177,7 +177,8 @@ const Game = ({
                         const { username } = currentUser;
                         if (sent_by === username) {
                             if (myCards.length === 1) {
-                                // endgame(); TODO
+                                // GANASTE
+                                // endgame();
                             }
                         } else {
                             if (myCards.length === 1 && !currentUser.saidUNO) {
@@ -535,8 +536,8 @@ export default connect(
     dispatch => ({
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
-                // url: 'ws://localhost:8080',
-                url: 'ws://18.135.12.10:8080',
+                url: 'ws://localhost:8080',
+                // url: 'ws://18.135.12.10:8080',
             }));
         },
         socket_send(gameInfo, socket, messageData) {

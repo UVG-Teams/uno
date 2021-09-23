@@ -1,4 +1,6 @@
 import React from 'react';
+import CryptoJS from 'crypto-js';
+
 import { connect } from 'react-redux';
 import './styles.css';
 import * as selectors from '../../reducers';
@@ -22,7 +24,7 @@ export default connect(
     player: selectors.getCurrentUserInfo(state),
     gameInfo: selectors.getGameInfo(state),
     myCards: selectors.getMyCards(state),
-    deck: selectors.getDeck(state),
+    deck: selectors.getGameDeck(state),
   }),
   dispatch => ({
     onClick: (socket, player, gameInfo, myCards, deck) => {
@@ -51,18 +53,25 @@ export default connect(
       socket.send(JSON.stringify(message));
       dispatch(chatActions.sendMessage(message));
       
-      if (myCards.length !== 1) {
+      if (myCards.length !== 1 && !player.saidUno) {
         // Takes two cards from the deck
+        const headers = btoa(JSON.stringify({ roomCode: gameInfo.roomCode }));
         for (let i = 0; i<2; i++) {
           const randomCard = deck.pop();
+          const gameMoveMessage = {
+            type: 'game_move',
+            roomCode: gameInfo.roomCode,
+            sent_by: player.username,
+            moved_card: randomCard,
+            sent_at: Date.now(),
+            moved_to: player.username,
+          }
+          const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(gameMoveMessage), gameInfo.password).toString();
+
           socket.send(
             JSON.stringify({
-              type: 'game_move',
-              roomCode: gameInfo.roomCode,
-              sent_by: player.username,
-              moved_card: randomCard,
-              sent_at: Date.now(),
-              moved_to: player.username,
+              headers,
+              body: ciphertext,
             })
           );
           dispatch(actions.moveCard({
@@ -75,14 +84,21 @@ export default connect(
 
         const messageMistake = {
           type: 'text',
-          sent_by: player.username,
           roomCode: gameInfo.roomCode,
+          sent_by: player.username,
           text: 'Sorry, I messed up! Already took my extra cards...',
           sent_at: Date.now(),
         };
+
+        const mistakeCipherText = CryptoJS.AES.encrypt(JSON.stringify(messageMistake), gameInfo.password).toString();
   
-        socket.send(JSON.stringify(messageMistake));
+        socket.send(JSON.stringify({
+          headers,
+          body: mistakeCipherText,
+        }));
         dispatch(chatActions.sendMessage(messageMistake));
+      } else {
+        // GANASTE
       }
     }
   }),
