@@ -20,6 +20,7 @@ import winnerGIF from '../Resources/winner.gif';
 
 import './styles.css';
 import Chat from '../Chat';
+import UnoButton from '../UnoButton';
 
 import * as selectors from '../../reducers';
 import * as gameState from '../../reducers/game';
@@ -171,6 +172,21 @@ const Game = ({
                         receiveCardMovement(body);
                         break;
                     };
+                    case 'uno_button_clicked': {
+                        const { sent_by } = messageData;
+                        const { username } = currentUser;
+                        if (sent_by === username) {
+                            if (myCards.length === 1) {
+                                // GANASTE
+                                // endgame();
+                            }
+                        } else {
+                            if (myCards.length === 1 && !currentUser.saidUNO) {
+                                takeCard();
+                                takeCard();
+                            }
+                        }
+                    }
                     case 'join_game': {
                         if (body.password == gameInfo.password) {
                             if (!players.map(player => player.username).includes(body.sent_by)) {
@@ -329,7 +345,12 @@ const Game = ({
 
     return (
         <div className='game_page'>
-            <div style={{ position: 'absolute' }}>
+            <div className='room_name_background'>
+                <h1>
+                    {gameInfo.roomCode}
+                </h1>
+            </div>
+            <div style={{position: 'absolute'}}>
                 <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close
                 </Button>
@@ -427,6 +448,7 @@ const Game = ({
                     </div>
                 </DragDropContext>
                 <Chat/>
+                <UnoButton />
             </div>
             {/* Modal for change cards color */}
             <div>
@@ -514,8 +536,8 @@ export default connect(
     dispatch => ({
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
-                // url: 'ws://localhost:8080',
-                url: 'ws://18.135.12.10:8080',
+                url: 'ws://localhost:8080',
+                // url: 'ws://18.135.12.10:8080',
             }));
         },
         socket_send(gameInfo, socket, messageData) {
