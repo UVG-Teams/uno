@@ -385,7 +385,7 @@ const Game = ({
                     })
                 }
                 <DragDropContext onDragEnd={ onDragEnd }>
-                    <div className='droppables'>
+                    <div className='droppables' style={{ pointerEvents: `${turnsList[turns%turnsList.length]!==undefined ? (turnsList[turns%turnsList.length].username !== currentUser.username ? 'none': '' ) : ''}`}}>
                         <div className='deck_droppable'>
                             <Droppable droppableId='myDeck' direction='horizontal'>
                                 {(provided, snapshot) => (
