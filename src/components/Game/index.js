@@ -363,21 +363,21 @@ const Game = ({
             });
 
             moveMyCard(currentUser.username, moved_card, 'currentPlayedCard');
-            
+
             if( moved_card_number == 'skip') {
-                changeTurn(gameInfo, currentUser, socket, 2, reverse)
+                changeTurn(2, reverse)
             }else if(moved_card_number == 'draw' & moved_card_color !== 'wild') {
-                takeXCards(gameInfo, currentUser, socket, players, turns, 2)
-                changeTurn(gameInfo, currentUser, socket, 2, reverse)
+                takeXCards(players, turns, 2)
+                changeTurn(2, reverse)
             }else if(moved_card_number == 'draw' & moved_card_color == 'wild') {
-                takeXCards(gameInfo, currentUser, socket, players, turns, 4)
-                changeTurn(gameInfo, currentUser, socket, 2, reverse)
+                takeXCards(players, turns, 4)
+                changeTurn(2, reverse)
             }else if(moved_card_number == 'reverse' & moved_card_color !=='wild') {
-                reverseTurns(gameInfo, currentUser, socket);
-                changeTurn(gameInfo, currentUser, socket, 1, !reverse)
+                reverseTurns();
+                changeTurn(1, !reverse)
             }
             else {
-                changeTurn(gameInfo, currentUser, socket, 1, reverse)
+                changeTurn(1, reverse)
             }
 
             if (moved_card_color == 'wild') {
@@ -461,7 +461,7 @@ const Game = ({
                                 deck.length > 0 ? (
                                     <Button onClick={() => {
                                         takeCard();
-                                        changeTurn(gameInfo, currentUser, socket, 1, reverse);
+                                        changeTurn(1, reverse);
                                     }}>
                                         <img src={ deck_1 } className='take_card'/>
                                     </Button>
@@ -565,7 +565,7 @@ const Game = ({
                             Home
                         </Button>
                     </div>
-                    
+
                 </Modal>
             </div>
         </div>
@@ -728,42 +728,39 @@ export default connect(
                 color: messageData.color,
             }))
         },
-        changeTurn(gameInfo, currentUser, socket, turns, reverse) {
+        changeTurn(gameInfo, currentUser, socket, socket_send, turns, reverse) {
             if(reverse){
                 turns = turns * (-1);
-            }
-            socket.send(
-                JSON.stringify({
-                    type: 'change_turn',
-                    roomCode: gameInfo.roomCode,
-                    sent_by: currentUser.username,
-                    turns: turns,
-                })
-            )
-            dispatch(gameState.actions.changeTurn(turns))
+            };
+
+            socket_send(gameInfo, socket, {
+                type: 'change_turn',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                turns: turns,
+            });
+
+            dispatch(gameState.actions.changeTurn(turns));
         },
         receiveChangeTurn(messageData) {
             dispatch(gameState.actions.changeTurn(messageData.turns))
         },
-        takeXCards(gameInfo, currentUser, socket, players, turns, cardsNumber) {
-            socket.send(
-                JSON.stringify({
-                    type: 'take_x_cards',
-                    roomCode: gameInfo.roomCode,
-                    sent_by: currentUser.username,
-                    take: players[(turns+1)%players.length].username,
-                    number: cardsNumber,
-                })
-            )
+        takeXCards(gameInfo, currentUser, socket, socket_send, players, turns, cardsNumber) {
+            socket_send(gameInfo, socket, {
+                type: 'take_x_cards',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                take: players[(turns+1)%players.length].username,
+                number: cardsNumber,
+            });
         },
-        reverseTurns(gameInfo, currentUser, socket) {
-            socket.send(
-                JSON.stringify({
-                    type: 'reverse_turn',
-                    roomCode: gameInfo.roomCode,
-                    sent_by: currentUser.username,
-                })
-            )
+        reverseTurns(gameInfo, currentUser, socket, socket_send) {
+            socket_send(gameInfo, socket, {
+                type: 'reverse_turn',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+            });
+
             dispatch(gameState.actions.playReverse());
         },
         receiveReverse(messageData){
@@ -795,7 +792,16 @@ export default connect(
             dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
         },
         changeColor(color, colorEsp=null) {
-            dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color, colorEsp)
-        }
+            dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color, colorEsp);
+        },
+        changeTurn(turns, reverse) {
+            dispatchProps.changeTurn(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, turns, reverse);
+        },
+        takeXCards(players, turns, cardsNumber) {
+            dispatchProps.takeXCards(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, players, turns, cardsNumber);
+        },
+        reverseTurns() {
+            dispatchProps.reverseTurns(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send);
+        },
     })
 )(Game);
