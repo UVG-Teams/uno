@@ -98,6 +98,7 @@ const Game = ({
     turnsList,
     reverse,
     socket_send,
+    receiveGameStarted,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -295,6 +296,16 @@ const Game = ({
                             });
                             alert(body.text);
                         };
+                        break;
+                    };
+                    case 'game_started': {
+                        receiveChatMessage({
+                            type: 'text',
+                            sent_by: body.sent_by,
+                            text: body.text,
+                            sent_at: body.sent_at,
+                        });
+                        receiveGameStarted()
                         break;
                     };
                     default: console.log(body);
@@ -663,7 +674,27 @@ export default connect(
         endgame() {
             dispatch(gameState.actions.startClosingGame());
         },
-        startgame() {
+        startgame(gameInfo, currentUser, socket, socket_send) {
+            socket_send(gameInfo, socket, {
+                type: 'game_started',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                sent_at: Date.now(),
+                text: 'Game on!'     
+            })
+            dispatch(gameState.actions.startPlayingGame())
+
+            const message = {
+                type: 'text',
+                sent_by: currentUser.username,
+                roomCode: gameInfo.roomCode,
+                text: 'Game on!',
+                sent_at: Date.now(),
+            };
+
+            dispatch(chatState.actions.sendMessage(message));
+        },
+        receiveGameStarted(){
             dispatch(gameState.actions.startPlayingGame())
         },
         receiveChatMessage(messageData) {
@@ -850,9 +881,9 @@ export default connect(
         setRandomInitialCard() {
             dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
         },
-        // startgame() {
-        //     dispatchProps.startgame(stateProps.gameInfo, stateProps.currentUser);
-        // }
+        startgame() {
+            dispatchProps.startgame(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send);
+        },
         changeColor(color, colorEsp=null) {
             dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color, colorEsp);
         },
