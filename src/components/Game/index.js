@@ -451,8 +451,17 @@ const Game = ({
         };
     };
 
+    let table_card = currentPlayedCard;
+    let table_card_color;
+    if (changedColor?.color) {
+        table_card_color = changedColor.color
+    } else {
+        table_card_color = table_card.map(card => card.content.split("_")[0]);
+    }
+
     return (
-        <div className='game_page'>
+        <div className={table_card_color == 'red' ? ['game_page bRed'] : table_card_color == 'green' ? ['game_page bGreen'] : table_card_color == 'blue' ? ['game_page bBlue'] : ['game_page bYellow']}>
+            {console.log(changedColor)}
             <div className='room_name_background'>
                 <h1>
                     {gameInfo.roomCode}

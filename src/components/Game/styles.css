@@ -1,12 +1,28 @@
 .game_page {
     height: 100vh;
     width: 100vw;
-    background-image: url('../Resources/table_0.png');
     background-size: contain;
     /* display: flex;
     flex-direction: column; */
     position: relative;
 }
+
+.bRed {
+    background-image: url('../Resources/table_0.png');
+}
+
+.bGreen {
+    background-image: url('../Resources/table_4.png');
+}
+
+.bBlue {
+    background-image: url('../Resources/table_3.png');
+}
+
+.bYellow {
+    background-image: url('../Resources/table_1.png');
+}
+
 
 .room_name_background {
     width: 100vw;
