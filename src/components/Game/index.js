@@ -5,7 +5,8 @@ import { Redirect } from 'react-router-dom';
 import { TextField, Button } from '@material-ui/core';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 
 import deck_1 from '../Resources/deck_1.png';
@@ -17,6 +18,9 @@ import deck_6 from '../Resources/deck_6.png';
 import deck_7 from '../Resources/deck_7.png';
 import deck_7plus from '../Resources/deck_7+.png';
 import winnerGIF from '../Resources/winner.gif';
+import startGame from '../Resources/start_game.png';
+
+
 
 import './styles.css';
 import Chat from '../Chat';
@@ -64,6 +68,7 @@ const Game = ({
     socket,
     connectWS,
     endgame,
+    startgame,
     myCards,
     currentPlayedCard,
     players,
@@ -94,6 +99,7 @@ const Game = ({
     reverse,
     socket_send,
     winGame,
+    receiveGameStarted,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -179,7 +185,10 @@ const Game = ({
                         break;
                     };
                     case 'game_move': {
-                        receiveCardMovement(body);
+                        receiveCardMovement({
+                            ...body,
+                            moved_by_me: body.moved_to === currentUser.username ? true : false,
+                        });
                         break;
                     };
                     case 'uno_button_clicked': {
@@ -270,19 +279,19 @@ const Game = ({
                         break;
                     };
                     case 'change_turn': {
-                        receiveChangeTurn(messageData);
+                        receiveChangeTurn(body);
                         break;
                     };
                     case 'take_x_cards': {
-                        if(messageData.take == currentUser.username) {
-                            for (let i = 0; i< messageData.number; i++){
+                        if(body.take == currentUser.username) {
+                            for (let i = 0; i< body.number; i++){
                                 takeCard();
                             }
                         }
                         break;
                     };
                     case 'reverse_turn': {
-                        receiveReverse(messageData);
+                        receiveReverse(body);
                         break
                     };
                     case 'error_alert': {
@@ -295,6 +304,16 @@ const Game = ({
                             });
                             alert(body.text);
                         };
+                        break;
+                    };
+                    case 'game_started': {
+                        receiveChatMessage({
+                            type: 'text',
+                            sent_by: body.sent_by,
+                            text: body.text,
+                            sent_at: body.sent_at,
+                        });
+                        receiveGameStarted()
                         break;
                     };
                     default: console.log(body);
@@ -526,6 +545,7 @@ const Game = ({
                     isOpen={modalIsOpen}
                     onRequestClose={closeModal}
                     contentLabel="Example Modal"
+                    shouldCloseOnOverlayClick={false}
                     style={customStyles}
                 >
                     <h2>Elige color</h2>
@@ -588,6 +608,58 @@ const Game = ({
 
                 </Modal>
             </div>
+            {/* Modal start game */}
+            <div>
+                <Modal
+                    isOpen= {gameInfo.started ? false : true }
+                    // onRequestClose={closeModal}
+                    contentLabel="Example Modal"
+                    style={customStyles2}
+                >
+                    <div style={{display: 'flex'}}>
+                        <div style={{width: '27vh', display: 'flex', flexDirection: 'column'}}>
+                            <h1 style={{textAlign: 'center'}}>UNO</h1>
+                            <label><b>Room code:</b> {gameInfo.roomCode}</label>
+                            <div style={{display: 'flex', marginBottom: '5%'}}>
+                                <label><b>Connected players: </b>{players.map(player => (<div style={{textAlign:'center'}}>{player.username}{"\n"}</div>))}</label>
+                            </div>
+                            {
+                                currentUser.username == gameInfo.roomOwner ? (
+                                        players.length < 3 ? (
+                                            <>
+                                                <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
+                                                <Button
+                                                    variant='contained'
+                                                    color='primary'
+                                                    disabled
+                                                >
+                                                    Start
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <Button
+                                                onClick={ () => startgame() }
+                                                variant='contained'
+                                                color='primary'
+                                            >
+                                                Start
+                                            </Button>
+                                        )
+                                ) : (
+                                    <div style={{display:'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20%'}}>
+                                        <FontAwesomeIcon icon={faSpinner} size='3x' className="fa-pulse"/>
+                                        <label style={{marginTop: '20%', textAlign: 'center'}}>Waiting for the host to start the game</label>
+                                    </div>
+                                )
+                            }
+                        </div>
+                        <div>
+                            <img src={ startGame } style={{height: '40vh'}}/>
+                        </div>
+                    </div>
+
+                </Modal>
+            </div>
         </div>
     );
 };
@@ -609,8 +681,8 @@ export default connect(
     dispatch => ({
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
-                url: 'ws://localhost:8080',
-                // url: 'ws://18.135.12.10:8080',
+                // url: 'ws://localhost:8080',
+                url: 'ws://3.11.105.145:8080',
             }));
         },
         socket_send(gameInfo, socket, messageData) {
@@ -624,6 +696,52 @@ export default connect(
         },
         endgame() {
             dispatch(gameState.actions.startClosingGame());
+        },
+        startgame(gameInfo, currentUser, socket, socket_send, takeCard, deck, players) {
+            socket_send(gameInfo, socket, {
+                type: 'game_started',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                sent_at: Date.now(),
+                text: 'Game on!'
+            })
+            dispatch(gameState.actions.startPlayingGame())
+
+            const message = {
+                type: 'text',
+                sent_by: currentUser.username,
+                roomCode: gameInfo.roomCode,
+                text: 'Game on!',
+                sent_at: Date.now(),
+            };
+
+            dispatch(chatState.actions.sendMessage(message));
+
+            for (let player_index in players){
+                let player = players[player_index];
+
+                for (let i=0; i<7; i++){
+                    const randomCard = deck.pop();
+                    socket_send(gameInfo, socket, {
+                        type: 'game_move',
+                        roomCode: gameInfo.roomCode,
+                        sent_by: player.username,
+                        moved_card: randomCard,
+                        sent_at: Date.now(),
+                        moved_to: player.username,
+                    });
+
+                    dispatch(gameState.actions.moveCard({
+                        moved_by: player.username,
+                        moved_card: randomCard,
+                        moved_to: player.username,
+                        moved_by_me: player.username === currentUser.username ? true : false,
+                    }));
+                }
+            }
+        },
+        receiveGameStarted(){
+            dispatch(gameState.actions.startPlayingGame());
         },
         receiveChatMessage(messageData) {
             dispatch(chatState.actions.receiveMessage({
@@ -643,6 +761,7 @@ export default connect(
                 moved_by: messageData.sent_by,
                 moved_card: messageData.moved_card,
                 moved_to: messageData.moved_to,
+                moved_by_me: messageData.moved_by_me,
             }));
         },
         receiveNewUser(messageData) {
@@ -681,7 +800,6 @@ export default connect(
                     cards: 0
                 });
             };
-
             socket_send(gameInfo, socket, {
                 type: 'welcome',
                 roomCode: gameInfo.roomCode,
@@ -766,7 +884,6 @@ export default connect(
             if(reverse){
                 turns = turns * (-1);
             };
-
             socket_send(gameInfo, socket, {
                 type: 'change_turn',
                 roomCode: gameInfo.roomCode,
@@ -827,6 +944,9 @@ export default connect(
         },
         changeMatchState(){
             dispatchProps.changeMatchState(stateProps.gameInfo);
+        },
+        startgame() {
+            dispatchProps.startgame(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, dispatchProps.takeCard, stateProps.deck, stateProps.players);
         },
         changeColor(color, colorEsp=null) {
             dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color, colorEsp);
