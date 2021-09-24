@@ -57,23 +57,23 @@
 
 .rival_deck_1 {
     margin-top: 23%;
-    margin-left: 10%;
+    margin-left: 5%;
 }
 
 .rival_deck_2 {
-    margin-top: 2%;
-    margin-left: 25%;
+    margin-top: 23%;
+    margin-left: 20%;
 }
 
 .rival_deck_3 {
-    margin-top: 2%;
-    margin-left: 55%;
+    margin-top: 7%;
+    margin-left: 5%;
 }
 
 .rival_deck_4 {
-    margin-top: 11%;
-    margin-right: 10%;
-    right: 0;
+    margin-top: 7%;
+    margin-left: 20%;
+    /* right: 0; */
 }
 
 .rival_cards {
@@ -98,6 +98,7 @@
     display: flex;
     flex-direction: row;
     left: 45%;
+    top: 8%
 }
 
 .container_change_color_buttons {
