@@ -98,8 +98,8 @@ const Game = ({
     turnsList,
     reverse,
     socket_send,
+    winGame,
     receiveGameStarted,
-    receiveInitialDeal,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -109,7 +109,7 @@ const Game = ({
     }, []);
 
     const [modalIsOpen, setIsOpen] = React.useState(false);
-
+    const [hasWon, setHasWon] = React.useState(false);
     function openModal() {
         setIsOpen(true);
     }
@@ -185,7 +185,10 @@ const Game = ({
                         break;
                     };
                     case 'game_move': {
-                        receiveCardMovement(body);
+                        receiveCardMovement({
+                            ...body,
+                            moved_by_me: body.moved_to === currentUser.username ? true : false,
+                        });
                         break;
                     };
                     case 'uno_button_clicked': {
@@ -202,6 +205,10 @@ const Game = ({
                                 takeCard();
                             }
                         }
+                        break;
+                    }
+                    case 'game_won': {
+                        setHasWon(true);
                     }
                     case 'join_game': {
                         if (body.password == gameInfo.password) {
@@ -309,12 +316,6 @@ const Game = ({
                         receiveGameStarted()
                         break;
                     };
-                    case 'initial_deal': {
-                        if(body.move_to == currentUser.username){
-                            receiveInitialDeal(currentUser, body.moved_card);
-                        }
-                        break;
-                    };
                     default: console.log(body);
                 };
             };
@@ -385,6 +386,20 @@ const Game = ({
                 moved_to: 'currentPlayedCard',
             });
 
+            console.log(myCards);
+            if (myCards.length === 1) {
+                setHasWon(true);
+                winGame(currentUser.username);
+                
+                socket_send(gameInfo, socket, {
+                    type: 'game_won',
+                    roomCode: gameInfo.roomCode,
+                    sent_by: currentUser.username,
+                    moved_card: moved_card,
+                    sent_at: Date.now(),
+                    moved_to: 'currentPlayedCard',
+                });
+            }
             moveMyCard(currentUser.username, moved_card, 'currentPlayedCard');
 
             if( moved_card_number == 'skip') {
@@ -409,6 +424,7 @@ const Game = ({
 
         };
     };
+
     return (
         <div className='game_page'>
             <div className='room_name_background'>
@@ -571,13 +587,13 @@ const Game = ({
             {/* Modal when there is a winner */}
             <div>
                 <Modal
-                    isOpen= {false}
+                    isOpen= {hasWon}
                     onRequestClose={closeModal}
                     contentLabel="Example Modal"
                     style={customStyles2}
                 >
                     <div style={{position: 'relative', display: 'flex', flexDirection: 'column', alignItems:'center'}}>
-                        <h1 style={{position: 'absolute'}}>"User" Won!</h1>
+                        <h1 style={{position: 'absolute'}}>{gameInfo.gameWinner} Won!</h1>
                         <img src={ winnerGIF } className='winnerIMG'/>
                         <Button
                             onClick={ () => endgame() }
@@ -607,7 +623,7 @@ const Game = ({
                                 <label><b>Connected players: </b>{players.map(player => (<div style={{textAlign:'center'}}>{player.username}{"\n"}</div>))}</label>
                             </div>
                             {
-                                currentUser.username == gameInfo.roomOwner ? (                                        
+                                currentUser.username == gameInfo.roomOwner ? (
                                         players.length < 3 ? (
                                             <>
                                                 <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
@@ -619,7 +635,7 @@ const Game = ({
                                                     Start
                                                 </Button>
                                             </>
-                                        ) : (                           
+                                        ) : (
                                             <Button
                                                 onClick={ () => startgame() }
                                                 variant='contained'
@@ -640,7 +656,7 @@ const Game = ({
                             <img src={ startGame } style={{height: '40vh'}}/>
                         </div>
                     </div>
-                    
+
                 </Modal>
             </div>
         </div>
@@ -686,7 +702,7 @@ export default connect(
                 roomCode: gameInfo.roomCode,
                 sent_by: currentUser.username,
                 sent_at: Date.now(),
-                text: 'Game on!'     
+                text: 'Game on!'
             })
             dispatch(gameState.actions.startPlayingGame())
 
@@ -699,45 +715,32 @@ export default connect(
             };
 
             dispatch(chatState.actions.sendMessage(message));
-            
-            for (let i=0; i<7; i++){
-                takeCard(gameInfo, currentUser, deck, socket, socket_send)
-            }
 
             for (let player_index in players){
-                let player = players[player_index]
+                let player = players[player_index];
+
                 for (let i=0; i<7; i++){
                     const randomCard = deck.pop();
-                    
                     socket_send(gameInfo, socket, {
-                        type: 'initial_deal',
+                        type: 'game_move',
                         roomCode: gameInfo.roomCode,
-                        sent_by: currentUser.username,
+                        sent_by: player.username,
                         moved_card: randomCard,
                         sent_at: Date.now(),
                         moved_to: player.username,
                     });
-        
+
                     dispatch(gameState.actions.moveCard({
                         moved_by: player.username,
                         moved_card: randomCard,
                         moved_to: player.username,
+                        moved_by_me: player.username === currentUser.username ? true : false,
                     }));
                 }
             }
-
-
         },
-        receiveGameStarted(gameInfo, currentUser, socket, socket_send, takeCard, deck){
+        receiveGameStarted(){
             dispatch(gameState.actions.startPlayingGame());
-        },
-        receiveInitialDeal(currentUser, moved_card){
-            dispatch(gameState.actions.moveCard({
-                moved_by: currentUser.username,
-                moved_card: moved_card,
-                moved_to: currentUser.username,
-                moved_by_me: true
-            }));
         },
         receiveChatMessage(messageData) {
             dispatch(chatState.actions.receiveMessage({
@@ -757,6 +760,7 @@ export default connect(
                 moved_by: messageData.sent_by,
                 moved_card: messageData.moved_card,
                 moved_to: messageData.moved_to,
+                moved_by_me: messageData.moved_by_me,
             }));
         },
         receiveNewUser(messageData) {
@@ -861,6 +865,20 @@ export default connect(
                 color: messageData.color,
             }))
         },
+        changeMatchState(currentUser, gameInfo, propState){
+            if (currentUser.username === gameInfo.roomOwner) {
+                if (propState.gameState === gameState.GAME_STATES.ROOM_CREATED) {
+                    dispatch(gameState.actions.startGame());
+                } else if (propState.gameState === gameState.GAME_STATES.PLAYING|| propState.gameState === gameState.GAME_STATES.WON) {
+                    dispatch(gameState.actions.startClosingGame());
+                }
+            } else {
+                // SALIR DE LA SALA
+            }
+        },
+        winGame(username) {
+            dispatch(gameState.actions.winGame(username));
+        },
         changeTurn(gameInfo, currentUser, socket, socket_send, turns, reverse) {
             if(reverse){
                 turns = turns * (-1);
@@ -923,11 +941,11 @@ export default connect(
         setRandomInitialCard() {
             dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
         },
+        changeMatchState(){
+            dispatchProps.changeMatchState(stateProps.gameInfo);
+        },
         startgame() {
             dispatchProps.startgame(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, dispatchProps.takeCard, stateProps.deck, stateProps.players);
-        },
-        receiveGameStarted() {
-            dispatchProps.receiveGameStarted(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, dispatchProps.takeCard, stateProps.deck);
         },
         changeColor(color, colorEsp=null) {
             dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color, colorEsp);

@@ -25,6 +25,10 @@ export const types = {
     TURNS_RECEIVED: 'TURNS_RECEIVED',
     REVERSE_PLAYED: 'REVERSE_PLAYED',
     UNO_BUTTON_PRESSED: 'UNO_BUTTON_PRESSED',
+    GAME_STARTED: 'GAME_STARTED',
+    GAME_ENDED: 'GAME_ENDED',
+    GAME_WON: 'GAME_WON',
+    RECEIVE_GAME_WINNER: 'RECEIVE_GAME_WINNER',
 };
 
 export const actions = {
@@ -100,22 +104,65 @@ export const actions = {
         type: types.UNO_BUTTON_PRESSED,
         payload,
     }),
+    winGame: (payload) => ({
+        type: types.GAME_WON,
+        payload,
+    }),
+    receiveWinner: payload => ({
+        type: types.RECEIVE_GAME_WINNER,
+        payload,
+    })
 };
+
+export const GAME_STATES = {
+    ROOM_CREATED: 'ROOM_CREATED',
+    PLAYING: 'PLAYING',
+    ENDED: 'ENDED',
+    WON: 'WON',
+}
 
 const gameInfo = (state = null, action) => {
     switch(action.type) {
         case types.GAME_INFO_RECEIVED: {
             return action.payload;
-        };
+        }
         case types.CREATE_GAME_STARTED: {
-            return action.payload;
-        };
+            return {
+                ...action.payload,
+                gameState: GAME_STATES.ROOM_CREATED,
+            };
+        }
         case types.JOIN_GAME_STARTED: {
             return action.payload;
-        };
+        }
         case types.CLOSE_GAME_COMPLETED: {
             return null;
-        };
+        }
+        case types.GAME_STARTED: {
+            return {
+                ...state,
+                gameState: GAME_STATES.PLAYING,
+            }
+        }
+        case types.GAME_ENDED: {
+            return {
+                ...state,
+                gameState: GAME_STATES.ENDED,
+            }
+        }
+        case types.GAME_WON: {
+            return {
+                ...state,
+                gameState: GAME_STATES.WON,
+                gameWinner: action.payload,
+            }
+        }
+        case types.RECEIVE_GAME_WINNER: {
+            return {
+                ...state,
+                winner: action.payload,
+            }
+        }
         case types.PLAY_GAME_STARTED: {
             return {
                 ...state,
@@ -141,7 +188,7 @@ const currentUserInfo = (state = {saidUNO: false}, action) => {
             }
         };
         case types.CARD_MOVED: {
-            const {payload} = action;
+            const { payload } = action;
             const newSaidUNO = payload.moved_to === state.username ? false : state.saidUNO;
             return {
                 ...state,
@@ -435,6 +482,7 @@ export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
 export const getDeck = state => state.deck;
 export const getChangedColor = state => state.changedColor;
+export const getGameState = state => state.gameInfo.gameState;
 export const getTurns = state => state.turns;
 export const getTurnsList = state => state.turnsList;
 export const getReverse = state => state.reverse;
