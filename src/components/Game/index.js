@@ -99,7 +99,6 @@ const Game = ({
     reverse,
     socket_send,
     receiveGameStarted,
-    receiveInitialDeal,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -185,7 +184,10 @@ const Game = ({
                         break;
                     };
                     case 'game_move': {
-                        receiveCardMovement(body);
+                        receiveCardMovement({
+                            ...body,
+                            moved_by_me: body.moved_to === currentUser.username ? true : false,
+                        });
                         break;
                     };
                     case 'uno_button_clicked': {
@@ -307,12 +309,6 @@ const Game = ({
                             sent_at: body.sent_at,
                         });
                         receiveGameStarted()
-                        break;
-                    };
-                    case 'initial_deal': {
-                        if(body.move_to == currentUser.username){
-                            receiveInitialDeal(currentUser, body.moved_card);
-                        }
                         break;
                     };
                     default: console.log(body);
@@ -608,8 +604,8 @@ const Game = ({
                                 <label><b>Connected players: </b>{players.map(player => (<div style={{textAlign:'center'}}>{player.username}{"\n"}</div>))}</label>
                             </div>
                             {
-                                currentUser.username == gameInfo.roomOwner ? (                                        
-                                        players.length<3 ? (
+                                currentUser.username == gameInfo.roomOwner ? (
+                                        players.length < 3 ? (
                                             <>
                                                 <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
                                                 <Button
@@ -620,7 +616,7 @@ const Game = ({
                                                     Start
                                                 </Button>
                                             </>
-                                        ) : (                           
+                                        ) : (
                                             <Button
                                                 onClick={ () => startgame() }
                                                 variant='contained'
@@ -641,7 +637,7 @@ const Game = ({
                             <img src={ startGame } style={{height: '40vh'}}/>
                         </div>
                     </div>
-                    
+
                 </Modal>
             </div>
         </div>
@@ -687,7 +683,7 @@ export default connect(
                 roomCode: gameInfo.roomCode,
                 sent_by: currentUser.username,
                 sent_at: Date.now(),
-                text: 'Game on!'     
+                text: 'Game on!'
             })
             dispatch(gameState.actions.startPlayingGame())
 
@@ -700,45 +696,32 @@ export default connect(
             };
 
             dispatch(chatState.actions.sendMessage(message));
-            
-            for (let i=0; i<7; i++){
-                takeCard(gameInfo, currentUser, deck, socket, socket_send)
-            }
 
             for (let player_index in players){
-                let player = players[player_index]
+                let player = players[player_index];
+
                 for (let i=0; i<7; i++){
                     const randomCard = deck.pop();
-                    
                     socket_send(gameInfo, socket, {
-                        type: 'initial_deal',
+                        type: 'game_move',
                         roomCode: gameInfo.roomCode,
-                        sent_by: currentUser.username,
+                        sent_by: player.username,
                         moved_card: randomCard,
                         sent_at: Date.now(),
                         moved_to: player.username,
                     });
-        
+
                     dispatch(gameState.actions.moveCard({
                         moved_by: player.username,
                         moved_card: randomCard,
                         moved_to: player.username,
+                        moved_by_me: player.username === currentUser.username ? true : false,
                     }));
                 }
             }
-
-
         },
         receiveGameStarted(gameInfo, currentUser, socket, socket_send, takeCard, deck){
             dispatch(gameState.actions.startPlayingGame());
-        },
-        receiveInitialDeal(currentUser, moved_card){
-            dispatch(gameState.actions.moveCard({
-                moved_by: currentUser.username,
-                moved_card: moved_card,
-                moved_to: currentUser.username,
-                moved_by_me: true
-            }));
         },
         receiveChatMessage(messageData) {
             dispatch(chatState.actions.receiveMessage({
@@ -758,6 +741,7 @@ export default connect(
                 moved_by: messageData.sent_by,
                 moved_card: messageData.moved_card,
                 moved_to: messageData.moved_to,
+                moved_by_me: messageData.moved_by_me,
             }));
         },
         receiveNewUser(messageData) {

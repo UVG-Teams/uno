@@ -141,7 +141,7 @@ const currentUserInfo = (state = {saidUNO: false}, action) => {
             }
         };
         case types.CARD_MOVED: {
-            const {payload} = action;
+            const { payload } = action;
             const newSaidUNO = payload.moved_to === state.username ? false : state.saidUNO;
             return {
                 ...state,
