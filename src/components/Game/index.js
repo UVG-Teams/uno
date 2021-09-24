@@ -265,19 +265,19 @@ const Game = ({
                         break;
                     };
                     case 'change_turn': {
-                        receiveChangeTurn(messageData);
+                        receiveChangeTurn(body);
                         break;
                     };
                     case 'take_x_cards': {
-                        if(messageData.take == currentUser.username) {
-                            for (let i = 0; i< messageData.number; i++){
+                        if(body.take == currentUser.username) {
+                            for (let i = 0; i< body.number; i++){
                                 takeCard();
                             }
                         }
                         break;
                     };
                     case 'reverse_turn': {
-                        receiveReverse(messageData);
+                        receiveReverse(body);
                         break
                     };
                     case 'error_alert': {
@@ -661,7 +661,6 @@ export default connect(
                     cards: 0
                 });
             };
-
             socket_send(gameInfo, socket, {
                 type: 'welcome',
                 roomCode: gameInfo.roomCode,
@@ -732,7 +731,6 @@ export default connect(
             if(reverse){
                 turns = turns * (-1);
             };
-
             socket_send(gameInfo, socket, {
                 type: 'change_turn',
                 roomCode: gameInfo.roomCode,
