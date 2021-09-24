@@ -4,7 +4,8 @@ import { Redirect } from 'react-router-dom';
 import { TextField, Button } from '@material-ui/core';
 import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 
 import deck_1 from '../Resources/deck_1.png';
@@ -19,6 +20,7 @@ import winnerGIF from '../Resources/winner.gif';
 import startGame from '../Resources/startGame.png';
 import startGame2 from '../Resources/startgame.webp';
 import startGame3 from '../Resources/start_game.png';
+
 
 
 import './styles.css';
@@ -480,34 +482,42 @@ const Game = ({
                     style={customStyles2}
                 >
                     <div style={{display: 'flex'}}>
-                        <div style={{width: '25vh', display: 'flex', flexDirection: 'column'}}>
+                        <div style={{width: '27vh', display: 'flex', flexDirection: 'column'}}>
                             <h1 style={{textAlign: 'center'}}>UNO</h1>
                             <label><b>Room code:</b> {gameInfo.roomCode}</label>
                             <div style={{display: 'flex', marginBottom: '5%'}}>
                                 <label><b>Connected players: </b>{players.map(player => (<div style={{textAlign:'center'}}>{player.username}{"\n"}</div>))}</label>
                             </div>
-                            {/* <label>{players.length<3 ? 'No se puede jugar' : 'Juguemos'}</label> */}
-                            {players.length<3 ? (
-                                <>
-                                    <label>There must be at least 3 players connected</label>
-                                    <Button
-                                        onClick={ () => endgame() }
-                                        variant='contained'
-                                        color='primary'
-                                        disabled
-                                    >
-                                        Start
-                                    </Button>
-                                </>
-                            ) : (                           
-                                <Button
-                                    onClick={ () => endgame() }
-                                    variant='contained'
-                                    color='primary'
-                                >
-                                    Start
-                                </Button>
-                            )}
+                            {
+                                currentUser.username == gameInfo.roomOwner ? (                                        
+                                        players.length<3 ? (
+                                            <>
+                                                <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
+                                                <Button
+                                                    onClick={ () => endgame() }
+                                                    variant='contained'
+                                                    color='primary'
+                                                    disabled
+                                                >
+                                                    Start
+                                                </Button>
+                                            </>
+                                        ) : (                           
+                                            <Button
+                                                onClick={ () => endgame() }
+                                                variant='contained'
+                                                color='primary'
+                                            >
+                                                Start
+                                            </Button>
+                                        )
+                                ) : (
+                                    <div style={{display:'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20%'}}>
+                                        <FontAwesomeIcon icon={faSpinner} size='3x' className="fa-pulse"/>
+                                        <label style={{marginTop: '20%', textAlign: 'center'}}>Waiting for the host to start the game</label>
+                                    </div>
+                                )
+                            }
                         </div>
                         <div>
                             <img src={ startGame3 } style={{height: '40vh'}}/>

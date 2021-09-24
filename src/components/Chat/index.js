@@ -56,7 +56,7 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                             sendMessage(messageText)
                             setMessageText('')
                         }}>
-                        <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#ffffff' swapOpacity/>
+                        <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#ffffff' fa-spin swapOpacity/>
                     </button>
                      
                 </div>
