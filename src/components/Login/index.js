@@ -130,7 +130,6 @@ const Login = ({ gameInfo, createGame, endgame, joinGame }) => {
                         isOpen={modalIsOpen}
                         onRequestClose={() => setIsOpen(false)}               
                         contentLabel="Example Modal"
-                        // shouldCloseOnOverlayClick={false}
                         style={customStyles}
                     >
                         <div>
