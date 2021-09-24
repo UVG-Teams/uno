@@ -99,6 +99,7 @@ const Game = ({
     reverse,
     socket_send,
     receiveGameStarted,
+    receiveInitialDeal,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -306,6 +307,12 @@ const Game = ({
                             sent_at: body.sent_at,
                         });
                         receiveGameStarted()
+                        break;
+                    };
+                    case 'initial_deal': {
+                        if(body.move_to == currentUser.username){
+                            receiveInitialDeal(currentUser, body.moved_card);
+                        }
                         break;
                     };
                     default: console.log(body);
@@ -674,7 +681,7 @@ export default connect(
         endgame() {
             dispatch(gameState.actions.startClosingGame());
         },
-        startgame(gameInfo, currentUser, socket, socket_send) {
+        startgame(gameInfo, currentUser, socket, socket_send, takeCard, deck, players) {
             socket_send(gameInfo, socket, {
                 type: 'game_started',
                 roomCode: gameInfo.roomCode,
@@ -693,9 +700,45 @@ export default connect(
             };
 
             dispatch(chatState.actions.sendMessage(message));
+            
+            for (let i=0; i<7; i++){
+                takeCard(gameInfo, currentUser, deck, socket, socket_send)
+            }
+
+            for (let player_index in players){
+                let player = players[player_index]
+                for (let i=0; i<7; i++){
+                    const randomCard = deck.pop();
+                    
+                    socket_send(gameInfo, socket, {
+                        type: 'initial_deal',
+                        roomCode: gameInfo.roomCode,
+                        sent_by: currentUser.username,
+                        moved_card: randomCard,
+                        sent_at: Date.now(),
+                        moved_to: player.username,
+                    });
+        
+                    dispatch(gameState.actions.moveCard({
+                        moved_by: player.username,
+                        moved_card: randomCard,
+                        moved_to: player.username,
+                    }));
+                }
+            }
+
+
         },
-        receiveGameStarted(){
-            dispatch(gameState.actions.startPlayingGame())
+        receiveGameStarted(gameInfo, currentUser, socket, socket_send, takeCard, deck){
+            dispatch(gameState.actions.startPlayingGame());
+        },
+        receiveInitialDeal(currentUser, moved_card){
+            dispatch(gameState.actions.moveCard({
+                moved_by: currentUser.username,
+                moved_card: moved_card,
+                moved_to: currentUser.username,
+                moved_by_me: true
+            }));
         },
         receiveChatMessage(messageData) {
             dispatch(chatState.actions.receiveMessage({
@@ -882,7 +925,10 @@ export default connect(
             dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
         },
         startgame() {
-            dispatchProps.startgame(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send);
+            dispatchProps.startgame(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, dispatchProps.takeCard, stateProps.deck, stateProps.players);
+        },
+        receiveGameStarted() {
+            dispatchProps.receiveGameStarted(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, dispatchProps.takeCard, stateProps.deck);
         },
         changeColor(color, colorEsp=null) {
             dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color, colorEsp);
