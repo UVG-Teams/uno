@@ -98,6 +98,7 @@ const Game = ({
     turnsList,
     reverse,
     socket_send,
+    winGame,
     receiveGameStarted,
 }) => {
     useEffect(() => {
@@ -108,7 +109,7 @@ const Game = ({
     }, []);
 
     const [modalIsOpen, setIsOpen] = React.useState(false);
-
+    const [hasWon, setHasWon] = React.useState(false);
     function openModal() {
         setIsOpen(true);
     }
@@ -204,6 +205,10 @@ const Game = ({
                                 takeCard();
                             }
                         }
+                        break;
+                    }
+                    case 'game_won': {
+                        setHasWon(true);
                     }
                     case 'join_game': {
                         if (body.password == gameInfo.password) {
@@ -381,6 +386,20 @@ const Game = ({
                 moved_to: 'currentPlayedCard',
             });
 
+            console.log(myCards);
+            if (myCards.length === 1) {
+                setHasWon(true);
+                winGame(currentUser.username);
+                
+                socket_send(gameInfo, socket, {
+                    type: 'game_won',
+                    roomCode: gameInfo.roomCode,
+                    sent_by: currentUser.username,
+                    moved_card: moved_card,
+                    sent_at: Date.now(),
+                    moved_to: 'currentPlayedCard',
+                });
+            }
             moveMyCard(currentUser.username, moved_card, 'currentPlayedCard');
 
             if( moved_card_number == 'skip') {
@@ -405,6 +424,7 @@ const Game = ({
 
         };
     };
+
     return (
         <div className='game_page'>
             <div className='room_name_background'>
@@ -568,13 +588,13 @@ const Game = ({
             {/* Modal when there is a winner */}
             <div>
                 <Modal
-                    isOpen= {false}
+                    isOpen= {hasWon}
                     onRequestClose={closeModal}
                     contentLabel="Example Modal"
                     style={customStyles2}
                 >
                     <div style={{position: 'relative', display: 'flex', flexDirection: 'column', alignItems:'center'}}>
-                        <h1 style={{position: 'absolute'}}>"User" Won!</h1>
+                        <h1 style={{position: 'absolute'}}>{gameInfo.gameWinner} Won!</h1>
                         <img src={ winnerGIF } className='winnerIMG'/>
                         <Button
                             onClick={ () => endgame() }
@@ -720,7 +740,7 @@ export default connect(
                 }
             }
         },
-        receiveGameStarted(gameInfo, currentUser, socket, socket_send, takeCard, deck){
+        receiveGameStarted(){
             dispatch(gameState.actions.startPlayingGame());
         },
         receiveChatMessage(messageData) {
@@ -846,6 +866,20 @@ export default connect(
                 color: messageData.color,
             }))
         },
+        changeMatchState(currentUser, gameInfo, propState){
+            if (currentUser.username === gameInfo.roomOwner) {
+                if (propState.gameState === gameState.GAME_STATES.ROOM_CREATED) {
+                    dispatch(gameState.actions.startGame());
+                } else if (propState.gameState === gameState.GAME_STATES.PLAYING|| propState.gameState === gameState.GAME_STATES.WON) {
+                    dispatch(gameState.actions.startClosingGame());
+                }
+            } else {
+                // SALIR DE LA SALA
+            }
+        },
+        winGame(username) {
+            dispatch(gameState.actions.winGame(username));
+        },
         changeTurn(gameInfo, currentUser, socket, socket_send, turns, reverse) {
             if(reverse){
                 turns = turns * (-1);
@@ -908,11 +942,11 @@ export default connect(
         setRandomInitialCard() {
             dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
         },
+        changeMatchState(){
+            dispatchProps.changeMatchState(stateProps.gameInfo);
+        },
         startgame() {
             dispatchProps.startgame(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, dispatchProps.takeCard, stateProps.deck, stateProps.players);
-        },
-        receiveGameStarted() {
-            dispatchProps.receiveGameStarted(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, dispatchProps.takeCard, stateProps.deck);
         },
         changeColor(color, colorEsp=null) {
             dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color, colorEsp);
