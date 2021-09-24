@@ -506,6 +506,7 @@ const Game = ({
                     isOpen={modalIsOpen}
                     onRequestClose={closeModal}
                     contentLabel="Example Modal"
+                    shouldCloseOnOverlayClick={false}
                     style={customStyles}
                 >
                     <h2>Elige color</h2>
@@ -590,7 +591,7 @@ export default connect(
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
                 // url: 'ws://localhost:8080',
-                url: 'ws://18.135.12.10:8080',
+                url: 'ws://3.11.105.145:8080',
             }));
         },
         socket_send(gameInfo, socket, messageData) {
