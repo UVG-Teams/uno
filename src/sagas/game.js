@@ -1,4 +1,5 @@
 import { takeEvery, put, select } from 'redux-saga/effects';
+import CryptoJS from 'crypto-js';
 
 
 import * as selectors from '../reducers';
@@ -18,14 +19,22 @@ function* leaveGame(action) {
 
         // If deck means that the user was already in
         if (deck.length > 0) {
-            socket.send(
-                JSON.stringify({
-                    type: 'leave_game',
-                    roomCode: gameInfo.roomCode,
-                    sent_by: currentUser.username,
-                    sent_at: Date.now(),
-                })
-            );
+
+            const message = {
+                type: 'leave_game',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                sent_at: Date.now(),
+            };
+
+            const headers = btoa(JSON.stringify({ roomCode: gameInfo.roomCode }));
+            const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(message), gameInfo.password).toString();
+
+            socket.send(JSON.stringify({
+                headers: headers,
+                body: ciphertext
+            }));
+
         };
 
         socket.close();
