@@ -687,6 +687,9 @@ export default connect(
         },
         setRandomInitialCard() {
             dispatchProps.setRandomInitialCard(stateProps.currentUser, stateProps.deck, stateProps.socket);
-        }
+        },
+        // startgame() {
+        //     dispatchProps.startgame(stateProps.gameInfo, stateProps.currentUser);
+        // }
     })
 )(Game);
