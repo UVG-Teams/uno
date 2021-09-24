@@ -265,19 +265,19 @@ const Game = ({
                         break;
                     };
                     case 'change_turn': {
-                        receiveChangeTurn(messageData);
+                        receiveChangeTurn(body);
                         break;
                     };
                     case 'take_x_cards': {
-                        if(messageData.take == currentUser.username) {
-                            for (let i = 0; i< messageData.number; i++){
+                        if(body.take == currentUser.username) {
+                            for (let i = 0; i< body.number; i++){
                                 takeCard();
                             }
                         }
                         break;
                     };
                     case 'reverse_turn': {
-                        receiveReverse(messageData);
+                        receiveReverse(body);
                         break
                     };
                     case 'error_alert': {
@@ -506,6 +506,7 @@ const Game = ({
                     isOpen={modalIsOpen}
                     onRequestClose={closeModal}
                     contentLabel="Example Modal"
+                    shouldCloseOnOverlayClick={false}
                     style={customStyles}
                 >
                     <h2>Elige color</h2>
@@ -590,7 +591,7 @@ export default connect(
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
                 // url: 'ws://localhost:8080',
-                url: 'ws://18.135.12.10:8080',
+                url: 'ws://3.11.105.145:8080',
             }));
         },
         socket_send(gameInfo, socket, messageData) {
@@ -661,7 +662,6 @@ export default connect(
                     cards: 0
                 });
             };
-
             socket_send(gameInfo, socket, {
                 type: 'welcome',
                 roomCode: gameInfo.roomCode,
@@ -732,7 +732,6 @@ export default connect(
             if(reverse){
                 turns = turns * (-1);
             };
-
             socket_send(gameInfo, socket, {
                 type: 'change_turn',
                 roomCode: gameInfo.roomCode,
