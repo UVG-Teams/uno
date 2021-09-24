@@ -526,8 +526,7 @@ const Game = ({
             {/* Modal for change cards color */}
             <div>
                 <Modal
-                    isOpen={modalIsOpen}
-                    onRequestClose={closeModal}
+                    isOpen={modalIsOpen}                    
                     contentLabel="Example Modal"
                     shouldCloseOnOverlayClick={false}
                     style={customStyles}
@@ -609,7 +608,7 @@ const Game = ({
                             </div>
                             {
                                 currentUser.username == gameInfo.roomOwner ? (                                        
-                                        players.length<3 ? (
+                                        players.length < 3 ? (
                                             <>
                                                 <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
                                                 <Button

@@ -1,70 +1,48 @@
-# Getting Started with Create React App
+# UNO
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Objective of the game
+Be the first to run out of cards.
 
-## Available Scripts
+## Game rules
+1. Each player will receive 7 starting cards and there will be a starting card on the table, along with a deck for drawing cards.
+2. When it is your turn, you must place a card that matches, either in number or color, with the card on the table.
+    
+    *Example: If the table card is a red 7, you have to place a red card of any number or a 7 of any color. You can also place an action card.*
+3. If you don't have any cards that you can place, then they have to grab one from the deck on the table.
+4. Whether you've put down a card or picked one from the deck, your turn goes to the next player.
+5. When you are left with a single card you must press the "UNO" button, if someone presses it before you, you will have to take two cards from the deck. If an opponent has only one card and does not press "UNO" then you can press it and the opponent will receive two penalty cards.
+6. The player who runs out of cards wins.
 
-In the project directory, you can run:
+## Action cards
+
+<table>
+    <tr>
+        <td valign="top"><img src="public/images/blue_draw.png" alt="Draw Two Card" width="250"/></td>
+        <td valign="top"><b>Draw Two Card:</b> When this card is placed, the next player draws two cards and loses his turn. This card can only be discarded onto a card of the same color or onto another Draw 2 card.</td>
+    </tr>
+    <tr>
+        <td valign="top"><img src="public/images/red_reverse.png" alt="Reverse Card" width="250"/></td>
+        <td valign="top"><b>Reverse Card:</b> change the direction of the game. If the player to the left of the person placing the card were to play, this player loses his turn; instead the person on the right will play, and the direction will shift to the right. This card can only be discarded on a card of the same color or on another Reverse card.</td>
+    </tr>
+    <tr>
+        <td valign="top"><img src="public/images/green_skip.png" alt="Skip Card" width="250"/></td>
+        <td valign="top"><b>Skip Card:</b> the player whose turn it is to play loses his turn and it is the turn of the next one according to the direction of the game. This card can only be discarded on a card of the same color or on another Jump card.</td>
+    </tr>
+    <tr>
+        <td valign="top"><img src="public/images/wild_color.png" alt="Wild Card" width="250"/></td>
+        <td valign="top"><b>Wild Card:</b> the player who discards this card will say the new color that will be played or can repeat the one that was already there to be discarded. This card can be placed with any card.</td>
+    </tr>
+    <tr>
+        <td valign="top"><img src="public/images/wild_draw.png" alt="Wild Draw Four Card" width="250"/></td>
+        <td valign="top"><b>Wild Draw Four Card:</b> whoever places this card chooses its color and makes the next player draw 4 cards from the deck on the table and lose their turn. This card can be placed with any card.</td>
+    </tr>
+</table>
+
 
 ### `yarn start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
