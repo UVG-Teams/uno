@@ -17,9 +17,7 @@ import deck_6 from '../Resources/deck_6.png';
 import deck_7 from '../Resources/deck_7.png';
 import deck_7plus from '../Resources/deck_7+.png';
 import winnerGIF from '../Resources/winner.gif';
-import startGame from '../Resources/startGame.png';
-import startGame2 from '../Resources/startgame.webp';
-import startGame3 from '../Resources/start_game.png';
+import startGame from '../Resources/start_game.png';
 
 
 
@@ -68,6 +66,7 @@ const Game = ({
     socket,
     connectWS,
     endgame,
+    startgame,
     myCards,
     currentPlayedCard,
     players,
@@ -476,8 +475,8 @@ const Game = ({
             {/* Modal start game */}
             <div>
                 <Modal
-                    isOpen= {true}
-                    onRequestClose={closeModal}
+                    isOpen= {gameInfo.started ? false : true }
+                    // onRequestClose={closeModal}
                     contentLabel="Example Modal"
                     style={customStyles2}
                 >
@@ -494,7 +493,6 @@ const Game = ({
                                             <>
                                                 <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
                                                 <Button
-                                                    onClick={ () => endgame() }
                                                     variant='contained'
                                                     color='primary'
                                                     disabled
@@ -504,7 +502,7 @@ const Game = ({
                                             </>
                                         ) : (                           
                                             <Button
-                                                onClick={ () => endgame() }
+                                                onClick={ () => startgame() }
                                                 variant='contained'
                                                 color='primary'
                                             >
@@ -520,7 +518,7 @@ const Game = ({
                             }
                         </div>
                         <div>
-                            <img src={ startGame3 } style={{height: '40vh'}}/>
+                            <img src={ startGame } style={{height: '40vh'}}/>
                         </div>
                     </div>
                     
@@ -544,12 +542,15 @@ export default connect(
     dispatch => ({
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
-                url: 'ws://localhost:8080'
-                // url: 'ws://18.135.12.10:8080'
+                // url: 'ws://localhost:8080'
+                url: 'ws://3.11.105.145:8080'
             }));
         },
         endgame() {
             dispatch(gameState.actions.startClosingGame());
+        },
+        startgame() {
+            dispatch(gameState.actions.startPlayingGame())
         },
         receiveChatMessage(messageData) {
             dispatch(chatState.actions.receiveMessage({

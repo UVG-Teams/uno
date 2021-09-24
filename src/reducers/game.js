@@ -7,6 +7,7 @@ const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 export const types = {
     CREATE_GAME_STARTED: 'CREATE_GAME_STARTED',
     JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
+    PLAY_GAME_STARTED: 'PLAY_GAME_STARTED',
     CLOSE_GAME_STARTED: 'CLOSE_GAME_STARTED',
     CLOSE_GAME_COMPLETED: 'CLOSE_GAME_COMPLETED',
     CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
@@ -30,6 +31,9 @@ export const actions = {
     startJoiningGame: joinData => ({
         type: types.JOIN_GAME_STARTED,
         payload: joinData
+    }),
+    startPlayingGame: () => ({
+        type: types.PLAY_GAME_STARTED,
     }),
     startClosingGame: () => ({
         type: types.CLOSE_GAME_STARTED,
@@ -93,6 +97,12 @@ const gameInfo = (state = null, action) => {
         case types.CLOSE_GAME_COMPLETED: {
             return null;
         };
+        case types.PLAY_GAME_STARTED: {
+            return {
+                ...state,
+                started: true,
+            }
+        }
         default: return state;
     };
 };
