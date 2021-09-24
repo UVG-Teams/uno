@@ -422,7 +422,7 @@ const Game = ({
                 </Button>
             </div>
             <div className='turns'>
-                <h2 style={{paddingRight:5}}>Turno de:  </h2>
+                <h2 style={{paddingRight:5}}>Turn of:  </h2>
                 <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2>
             </div>
             <div className='dnd'>

@@ -1,3 +1,11 @@
+# Table of contents
+1. [Uno Game](#uno)
+    * [Objective of the game](#objective-of-the-game)
+    * [Game rules](#game-rules)
+    * [Action cards](#action-cards)
+2. [How to play on the platform](#how-to-play-on-the-platform)
+
+
 # UNO
 
 ## Objective of the game
@@ -39,10 +47,26 @@ Be the first to run out of cards.
 </table>
 
 
-### `yarn start`
+# How to play on the platform
+1. You must put the name with which you want to enter the game, a room code, if you are the creator of the room it can be any code (i.e. room1) otherwise, enter the room code that was provided to you along with the password; If you are the creator of the room, you can put any password that you will provide to others. Finally, if you are the creator of the room, then you must click on "Create room", otherwise "Sign in".
+<p align="center">  
+    <img src="public/images/preview/signin.png" alt="Sign in page" width="650"/>
+</p>
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+2. If you are the creator of the room you must wait for a minimum of 3 users to connect (maximum of 5 users) to start the game and only you can start it, the rest of the users will have a waiting window.
+<p align="center">  
+    <img src="public/images/preview/owner_wait.png" alt="Owner waiting room" width="650"/>
+    <img src="public/images/preview/user_wait.png" alt="User waiting room" width="650"/>
+</p>
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+3. Once there is a minimum of 3 users connected and the owner starts the game, each user will automatically deal 7 cards and the global card. In the center is the deck, where when you click, you grab a card, and the global card, which is where we must discard cards. In the lower right corner there is a chat where you can chat with the users connected to the room. Just above the chat the button of one. At the top you have the name of the room and whose turn it is to play. Around the deck are the users (rivals) connected and the amount of cards they have. At the bottom are the cards we have.
+<p align="center">  
+    <img src="public/images/preview/game.png" alt="Game page" width="650"/>
+</p>
+
+4. To place a card, it is only with drag and drop. If you are placing a valid card then you will see it in the center of the table, otherwise it will return to your cards.
+<p align="center">  
+    <img src="public/images/preview/dnd.gif" alt="Drag and drop" width="650"/>
+</p>
+
 
