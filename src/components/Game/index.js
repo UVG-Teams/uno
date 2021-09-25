@@ -9,6 +9,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 import Markdown from 'markdown-to-jsx';
+import { bounce } from 'react-animations';
+import styled, { keyframes } from 'styled-components';
+import Radium, {StyleRoot} from 'radium';
 
 import deck_1 from '../Resources/deck_1.png';
 import deck_2 from '../Resources/deck_2.png';
@@ -61,6 +64,8 @@ const getListStyle = isDraggingOver => ({
     paddingTop: 80,
     display: 'flex',
 });
+
+const Bounce = styled.div`animation: 2s ${keyframes`${bounce}`} infinite`;
 
 
 const Game = ({
@@ -477,7 +482,13 @@ const Game = ({
             </div>
             <div className='turns'>
                 <h2 style={{paddingRight:5}}>Turn of:  </h2>
-                <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2>
+                {/* <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2> */}
+                {
+                    currentUser.username == turnsList[turns%turnsList.length].username ? (
+                        <Bounce><h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2></Bounce>
+                    ) : (
+                        <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2>)
+                }
             </div>
             <div className='dnd'>
                 {
