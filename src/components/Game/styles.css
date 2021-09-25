@@ -135,8 +135,11 @@
     position: absolute;
     display: flex;
     flex-direction: row;
-    left: 45%;
-    top: 8%
+    left: 42%;
+    top: 12%;
+    background-color: gainsboro;
+    border-radius: 5px;
+    padding: 2% 4% 2% 4%;
 }
 
 .container_change_color_buttons {

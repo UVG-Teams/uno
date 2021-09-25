@@ -484,7 +484,7 @@ const Game = ({
                 <h2 style={{paddingRight:5}}>Turn of:  </h2>
                 {/* <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2> */}
                 {
-                    currentUser.username == turnsList[turns%turnsList.length].username ? (
+                    currentUser.username == (turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : '') ? (
                         <Bounce><h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2></Bounce>
                     ) : (
                         <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2>)
