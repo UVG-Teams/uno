@@ -245,7 +245,7 @@ const Game = ({
                         setHasWon(true);
                     }
                     case 'join_game': {
-                        if (players.length < 2){
+                        if (players.length < 10){
                             if (body.password == gameInfo.password) {
                                 if (!players.map(player => player.username).includes(body.sent_by)) {
     
@@ -695,7 +695,7 @@ const Game = ({
                             </div>
                             {
                                 currentUser.username == gameInfo.roomOwner ? (
-                                        players.length < 1 ? (
+                                        players.length < 3 ? (
                                             <>
                                                 <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
                                                 <Button
