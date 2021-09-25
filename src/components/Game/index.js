@@ -245,16 +245,29 @@ const Game = ({
                         setHasWon(true);
                     }
                     case 'join_game': {
-                        if (body.password == gameInfo.password) {
-                            if (!players.map(player => player.username).includes(body.sent_by)) {
-
-                                receiveNewUser(body);
-                                receiveChatMessage(body);
-
-                                if (currentUser.username == gameInfo.roomOwner) {
-                                    sendNewUserCurrentGameState(body);
+                        if (players.length < 2){
+                            if (body.password == gameInfo.password) {
+                                if (!players.map(player => player.username).includes(body.sent_by)) {
+    
+                                    receiveNewUser(body);
+                                    receiveChatMessage(body);
+    
+                                    if (currentUser.username == gameInfo.roomOwner) {
+                                        sendNewUserCurrentGameState(body);
+                                    };
+    
+                                } else {
+                                    if (currentUser.username == gameInfo.roomOwner) {
+                                        socket_send(gameInfo, socket, {
+                                            type: 'error_alert',
+                                            roomCode: gameInfo.roomCode,
+                                            sent_to: body.sent_by,
+                                            sent_by: currentUser.username,
+                                            text: `Ya hay un user con ese nombre`,
+                                            sent_at: Date.now(),
+                                        });
+                                    };
                                 };
-
                             } else {
                                 if (currentUser.username == gameInfo.roomOwner) {
                                     socket_send(gameInfo, socket, {
@@ -262,23 +275,23 @@ const Game = ({
                                         roomCode: gameInfo.roomCode,
                                         sent_to: body.sent_by,
                                         sent_by: currentUser.username,
-                                        text: `Ya hay un user con ese nombre`,
+                                        text: `Password incorrecta`,
                                         sent_at: Date.now(),
                                     });
                                 };
                             };
-                        } else {
+                        }else {
                             if (currentUser.username == gameInfo.roomOwner) {
                                 socket_send(gameInfo, socket, {
-                                        type: 'error_alert',
-                                        roomCode: gameInfo.roomCode,
-                                        sent_to: body.sent_by,
-                                        sent_by: currentUser.username,
-                                        text: `Password incorrecta`,
-                                        sent_at: Date.now(),
+                                    type: 'error_alert',
+                                    roomCode: gameInfo.roomCode,
+                                    sent_to: body.sent_by,
+                                    sent_by: currentUser.username,
+                                    text: `You can't join the room, it's full`,
+                                    sent_at: Date.now(),
                                 });
                             };
-                        };
+                        }
 
                         break;
                     };
