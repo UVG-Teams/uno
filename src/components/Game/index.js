@@ -248,14 +248,14 @@ const Game = ({
                         if (players.length < 10){
                             if (body.password == gameInfo.password) {
                                 if (!players.map(player => player.username).includes(body.sent_by)) {
-    
+
                                     receiveNewUser(body);
                                     receiveChatMessage(body);
-    
+
                                     if (currentUser.username == gameInfo.roomOwner) {
                                         sendNewUserCurrentGameState(body);
                                     };
-    
+
                                 } else {
                                     if (currentUser.username == gameInfo.roomOwner) {
                                         socket_send(gameInfo, socket, {
@@ -441,7 +441,7 @@ const Game = ({
             if (myCards.length === 1) {
                 setHasWon(true);
                 winGame(currentUser.username);
-                
+
                 socket_send(gameInfo, socket, {
                     type: 'game_won',
                     roomCode: gameInfo.roomCode,
@@ -569,7 +569,9 @@ const Game = ({
                         <div className='table_deck_droppable'>
                             {
                                 deck.length > 0 ? (
-                                    <Button  onClick={() => {
+                                    <Button
+                                        styles={{ pointerEvent: turnsList[turns%turnsList.length]!==undefined ? (turnsList[turns%turnsList.length].username !== currentUser.username ? 'none': '' ) : '' }}
+                                        onClick={() => {
                                         takeCard();
                                         changeTurn(1, reverse);
                                     }}>
@@ -613,7 +615,7 @@ const Game = ({
             {/* Modal for change cards color */}
             <div>
                 <Modal
-                    isOpen={modalIsOpen}                    
+                    isOpen={modalIsOpen}
                     contentLabel="Example Modal"
                     shouldCloseOnOverlayClick={false}
                     style={customStyles}
@@ -734,7 +736,7 @@ const Game = ({
             <div>
                     <Modal
                         isOpen={modalIsOpenHM}
-                        onRequestClose={() => setIsOpenHM(false)}               
+                        onRequestClose={() => setIsOpenHM(false)}
                         contentLabel="Example Modal"
                         style={customStylesHM}
                     >
@@ -936,8 +938,6 @@ export default connect(
                 color: color,
             });
 
-            let message;
-
             if(color !== null){
                 socket_send(gameInfo, socket, {
                     type: 'text',
@@ -947,21 +947,20 @@ export default connect(
                     sent_at: Date.now(),
                 });
 
-                message = {
+                const message = {
                     type: 'text',
                     roomCode: gameInfo.roomCode,
                     sent_by: currentUser.username,
                     text: 'Cambie el color a ' + colorEsp,
                     sent_at: Date.now(),
                 };
-            };
 
+                dispatch(chatState.actions.sendMessage(message));
+            };
 
             dispatch(gameState.actions.changeNewColor({
                 color: color,
             }));
-
-            dispatch(chatState.actions.sendMessage(message));
 
         },
         receiveChangeColor(messageData) {
