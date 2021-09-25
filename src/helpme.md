@@ -53,7 +53,7 @@ Be the first to run out of cards.
     <img src="./images/preview/signin.png" alt="Sign in page" width="650"/>
 </p>
 
-2. If you are the creator of the room you must wait for a minimum of 3 users to connect (maximum of 5 users) to start the game and only you can start it, the rest of the users will have a waiting window.
+2. If you are the creator of the room you must wait for a minimum of 3 users to connect (maximum of 10 users) to start the game and only you can start it, the rest of the users will have a waiting window.
 <p align="center">  
     <img src="./images/preview/owner_wait.png" alt="Owner waiting room" width="650"/>
     <img src="./images/preview/user_wait.png" alt="User waiting room" width="650"/>
@@ -68,5 +68,26 @@ Be the first to run out of cards.
 <p align="center">  
     <img src="./images/preview/dnd.gif" alt="Drag and drop" width="650"/>
 </p>
+
+5. You can know whose turn it is to play in the upper gray box. If it is your turn you will see your name bounce.
+<p align="center">  
+    <img src="./images/preview/turn.gif" alt="It's your turn" width="650"/>
+</p> 
+
+6. When you have a card to change color and place it, you will have to select the color in a window that will appear.
+<p align="center">  
+    <img src="./images/preview/change_color.gif" alt="Wild card" width="650"/>
+</p> 
+
+7. To know what color is being played, the background of the entire screen will change according to the color of the main card of the game.
+<p align="center">
+    <img src="./images/preview/background_color.gif" alt="Color of background" width="650"/>
+</p> 
+
+8. You can use the chat at any time of the game to communicate with the rest of the connected users.
+<p align="center">  
+    <img src="./images/preview/chat.gif" alt="Chat" width="650"/>
+</p> 
+
 
 
