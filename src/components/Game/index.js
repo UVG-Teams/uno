@@ -104,6 +104,9 @@ const Game = ({
     turnsList,
     reverse,
     socket_send,
+    playedCards,
+    resetDeck,
+    receiveResetDeck,
     winGame,
     receiveGameStarted,
 }) => {
@@ -323,8 +326,12 @@ const Game = ({
                     };
                     case 'reverse_turn': {
                         receiveReverse(body);
-                        break
+                        break;
                     };
+                    case 'reset_deck': {
+                        receiveResetDeck(body);
+                        break;
+                    }
                     case 'error_alert': {
                         if (body.sent_to == currentUser.username && deck.length <= 0) {
                             receiveChatMessage({
@@ -458,6 +465,7 @@ const Game = ({
 
     let table_card = currentPlayedCard;
     let table_card_color;
+
     if (changedColor?.color) {
         table_card_color = changedColor.color
     } else {
@@ -514,7 +522,7 @@ const Game = ({
                     })
                 }
                 <DragDropContext onDragEnd={ onDragEnd }>
-                    <div className='droppables' style={{ pointerEvents: `${turnsList[turns%turnsList.length]!==undefined ? (turnsList[turns%turnsList.length].username !== currentUser.username ? 'none': '' ) : ''}`}}>
+                    <div className='droppables' >
                         <div className='deck_droppable'>
                             <Droppable droppableId='myDeck' direction='horizontal'>
                                 {(provided, snapshot) => (
@@ -524,6 +532,7 @@ const Game = ({
                                         {
                                             myCards.map((item, index) => (
                                                 <Draggable
+                                                    isDragDisabled={turnsList[turns%turnsList.length]!==undefined ? (turnsList[turns%turnsList.length].username !== currentUser.username ? true: false ) : false}
                                                     key={ item.id }
                                                     draggableId={ item.id }
                                                     index={ index }>
@@ -547,13 +556,13 @@ const Game = ({
                         <div className='table_deck_droppable'>
                             {
                                 deck.length > 0 ? (
-                                    <Button onClick={() => {
+                                    <Button  onClick={() => {
                                         takeCard();
                                         changeTurn(1, reverse);
                                     }}>
                                         <img src={ deck_1 } className='take_card'/>
                                     </Button>
-                                ) : (<></>)
+                                ) : ( gameInfo.roomOwner == currentUser.username ?  resetDeck(gameInfo, currentUser, socket , socket_send, playedCards): (<></>))
                             }
                             <Droppable droppableId='playedDeck'>
                                 {(provided, snapshot) => (
@@ -741,6 +750,7 @@ export default connect(
         turns: selectors.getTurns(state),
         turnsList: selectors.getTurnsList(state),
         reverse: selectors.getReverse(state),
+        playedCards : selectors.getPlayedCards(state),
     }),
     dispatch => ({
         connectWS() {
@@ -920,9 +930,17 @@ export default connect(
                 });
             };
 
+            const message = {
+                type: 'text',
+                roomCode: gameInfo.roomCode,
+                sent_by: currentUser.username,
+                text: 'Cambie el color a ' + colorEsp,
+                sent_at: Date.now(),
+            }
             dispatch(gameState.actions.changeNewColor({
                 color: color,
             }));
+            dispatch(chatState.actions.sendMessage(message));
 
         },
         receiveChangeColor(messageData) {
@@ -981,6 +999,19 @@ export default connect(
         receiveReverse(messageData){
             dispatch(gameState.actions.playReverse());
         },
+        resetDeck(gameInfo, currentUser, socket , socket_send, playedCards){
+            socket_send(gameInfo, socket, {
+                type: 'reset_deck',
+                roomCode: gameInfo. roomCode,
+                sent_by: currentUser.username,
+                playedCards: playedCards,
+            });
+
+            dispatch(gameState.actions.resetDeck(playedCards))
+        },
+        receiveResetDeck(messageData){
+            dispatch(gameState.actions.resetDeck(messageData.playedCards))
+        }
     }),
     (stateProps, dispatchProps, ownProps) => ({
         ...ownProps,
