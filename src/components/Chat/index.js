@@ -23,6 +23,13 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
 
     const [messageText, setMessageText] = useState('');
 
+    let handleKeyPress = (event) => {
+        if(event.key === 'Enter'){
+            sendMessage(messageText)
+            setMessageText('')
+        }
+      }
+
     return (
         <div className='chat_component'>
             <div className='chat'>
@@ -50,6 +57,7 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                         placeholder='Write your message...'
                         className='inpMessage'
                         value={ messageText }
+                        onKeyPress={handleKeyPress}
                         onChange={ e => setMessageText(e.target.value) }
                     />
                     <button
@@ -60,6 +68,7 @@ const Chat = ({ currentUser, chat_messages, sendMessage }) => {
                         }}>
                         <FontAwesomeIcon icon={faPaperPlane} size='2x' color='#ffffff' fa-spin swapOpacity/>
                     </button>
+                    {(e) => e.key === 'Enter' && sendMessage(messageText)}
 
                 </div>
             </div>
