@@ -2,8 +2,6 @@
     height: 100vh;
     width: 100vw;
     background-size: contain;
-    /* display: flex;
-    flex-direction: column; */
     position: relative;
 }
 
@@ -66,30 +64,54 @@
     height: 32vh;
 }
 
-.rival_deck_1, .rival_deck_2, .rival_deck_3, .rival_deck_4  {
+.rival_deck_1, .rival_deck_2, .rival_deck_3, .rival_deck_4, .rival_deck_5, .rival_deck_6, .rival_deck_7, .rival_deck_8, .rival_deck_9  {
     position: absolute;
     color:  #ffffff;
 }
 
 .rival_deck_1 {
-    margin-top: 23%;
-    margin-left: 5%;
+    margin-top: 27%;
+    margin-left: 2%;
 }
 
 .rival_deck_2 {
-    margin-top: 23%;
-    margin-left: 20%;
+    margin-top: 27%;
+    margin-left: 13%;
 }
 
 .rival_deck_3 {
-    margin-top: 7%;
-    margin-left: 5%;
+    margin-top: 27%;
+    margin-left: 24%;
 }
 
 .rival_deck_4 {
-    margin-top: 7%;
-    margin-left: 20%;
-    /* right: 0; */
+    margin-top: 13%;
+    margin-left: 2%;
+}
+
+.rival_deck_5 {
+    margin-top: 13%;
+    margin-left: 13%;
+}
+
+.rival_deck_6 {
+    margin-top: 13%;
+    margin-left: 24%;
+}
+
+.rival_deck_7 {
+    margin-top: 1%;
+    margin-left: 2%;
+}
+
+.rival_deck_8 {
+    margin-top: 1%;
+    margin-left: 13%;
+}
+
+.rival_deck_9 {
+    margin-top: 1%;
+    margin-left: 24%;
 }
 
 .rival_cards {

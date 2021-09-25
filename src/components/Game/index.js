@@ -662,7 +662,7 @@ const Game = ({
                             </div>
                             {
                                 currentUser.username == gameInfo.roomOwner ? (
-                                        players.length < 1 ? (
+                                        players.length < 3 ? (
                                             <>
                                                 <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
                                                 <Button
