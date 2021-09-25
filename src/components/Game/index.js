@@ -8,6 +8,10 @@ import { DragDropContext, Droppable,  Draggable } from 'react-beautiful-dnd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
+import Markdown from 'markdown-to-jsx';
+import { bounce } from 'react-animations';
+import styled, { keyframes } from 'styled-components';
+import Radium, {StyleRoot} from 'radium';
 
 import deck_1 from '../Resources/deck_1.png';
 import deck_2 from '../Resources/deck_2.png';
@@ -61,6 +65,8 @@ const getListStyle = isDraggingOver => ({
     display: 'flex',
 });
 
+const Bounce = styled.div`animation: 2s ${keyframes`${bounce}`} infinite`;
+
 
 const Game = ({
     currentUser,
@@ -108,7 +114,19 @@ const Game = ({
         };
     }, []);
 
+    const [post, setPost] = useState('');
+    useEffect(() => {
+        import('../../helpme.md')
+            .then(res => {
+                fetch(res.default)
+                    .then(res => res.text())
+                    .then(res => setPost(res))
+            })
+            .catch(err => console.log(err));
+    });
+
     const [modalIsOpen, setIsOpen] = React.useState(false);
+    const [modalIsOpenHM, setIsOpenHM] = React.useState(false);
     const [hasWon, setHasWon] = React.useState(false);
     function openModal() {
         setIsOpen(true);
@@ -139,6 +157,19 @@ const Game = ({
           bottom: 'auto',
           marginRight: '-50%',
           transform: 'translate(-50%, -50%)',
+        },
+    };
+
+    const customStylesHM = {
+        content: {
+          top: '50%',
+          left: '50%',
+          right: 'auto',
+          bottom: 'auto',
+          marginRight: '-50%',
+          transform: 'translate(-50%, -50%)',
+          height: '50%',
+          width: '50%',
         },
     };
 
@@ -425,21 +456,39 @@ const Game = ({
         };
     };
 
+    let table_card = currentPlayedCard;
+    let table_card_color;
+    if (changedColor?.color) {
+        table_card_color = changedColor.color
+    } else {
+        table_card_color = table_card.map(card => card.content.split("_")[0]);
+    }
+
     return (
-        <div className='game_page'>
+        <div className={table_card_color == 'red' ? ['game_page bRed'] : table_card_color == 'green' ? ['game_page bGreen'] : table_card_color == 'blue' ? ['game_page bBlue'] : ['game_page bYellow']}>
+            {console.log(changedColor)}
             <div className='room_name_background'>
                 <h1>
                     {gameInfo.roomCode}
                 </h1>
             </div>
-            <div style={{position: 'absolute'}}>
+            <div style={{position: 'absolute', right: 0}}>
+                <Button onClick={() => setIsOpenHM(true)} variant='contained' color='primary' style={{marginRight:10}}>
+                    Help
+                </Button>
                 <Button onClick={() => endgame()} variant='contained' color='primary'>
                     Close
                 </Button>
             </div>
             <div className='turns'>
                 <h2 style={{paddingRight:5}}>Turn of:  </h2>
-                <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2>
+                {/* <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2> */}
+                {
+                    currentUser.username == (turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : '') ? (
+                        <Bounce><h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2></Bounce>
+                    ) : (
+                        <h2>{`${turnsList[turns%turnsList.length]!==undefined ? turnsList[turns%turnsList.length].username : ''}`}</h2>)
+                }
             </div>
             <div className='dnd'>
                 {
@@ -624,7 +673,7 @@ const Game = ({
                             </div>
                             {
                                 currentUser.username == gameInfo.roomOwner ? (
-                                        players.length < 3 ? (
+                                        players.length < 1 ? (
                                             <>
                                                 <label style={{color: 'red', fontSize: 12}}>There must be at least 3 players connected</label>
                                                 <Button
@@ -659,6 +708,22 @@ const Game = ({
 
                 </Modal>
             </div>
+            {/* Modal help me */}
+            <div>
+                    <Modal
+                        isOpen={modalIsOpenHM}
+                        onRequestClose={() => setIsOpenHM(false)}               
+                        contentLabel="Example Modal"
+                        style={customStylesHM}
+                    >
+                        <div>
+                            <Markdown>
+                                {post}
+                            </Markdown>
+                        </div>
+
+                    </Modal>
+                </div>
         </div>
     );
 };
@@ -680,8 +745,8 @@ export default connect(
     dispatch => ({
         connectWS() {
             dispatch(socketState.actions.startWSConnection({
-                // url: 'ws://localhost:8080',
-                url: 'ws://3.11.105.145:8080',
+                url: 'ws://localhost:8080',
+                // url: 'ws://3.11.105.145:8080',
             }));
         },
         socket_send(gameInfo, socket, messageData) {
