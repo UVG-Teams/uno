@@ -93,6 +93,7 @@ const Game = ({
     turnsList,
     reverse,
     socket_send,
+    playedCards,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -386,6 +387,8 @@ const Game = ({
 
         };
     };
+    console.log(deck)
+    console.log(playedCards)
     return (
         <div className='game_page'>
             <div className='room_name_background'>
@@ -426,7 +429,7 @@ const Game = ({
                     })
                 }
                 <DragDropContext onDragEnd={ onDragEnd }>
-                    <div className='droppables' style={{ pointerEvents: `${turnsList[turns%turnsList.length]!==undefined ? (turnsList[turns%turnsList.length].username !== currentUser.username ? 'none': '' ) : ''}`}}>
+                    <div className='droppables' >
                         <div className='deck_droppable'>
                             <Droppable droppableId='myDeck' direction='horizontal'>
                                 {(provided, snapshot) => (
@@ -436,6 +439,7 @@ const Game = ({
                                         {
                                             myCards.map((item, index) => (
                                                 <Draggable
+                                                    isDragDisabled={turnsList[turns%turnsList.length]!==undefined ? (turnsList[turns%turnsList.length].username !== currentUser.username ? true: false ) : false}
                                                     key={ item.id }
                                                     draggableId={ item.id }
                                                     index={ index }>
@@ -459,7 +463,7 @@ const Game = ({
                         <div className='table_deck_droppable'>
                             {
                                 deck.length > 0 ? (
-                                    <Button onClick={() => {
+                                    <Button style={{pointerEvents: `${turnsList[turns%turnsList.length]!==undefined ? (turnsList[turns%turnsList.length].username !== currentUser.username ? 'none': '' ) : ''}`}} onClick={() => {
                                         takeCard();
                                         changeTurn(1, reverse);
                                     }}>
@@ -586,6 +590,7 @@ export default connect(
         turns: selectors.getTurns(state),
         turnsList: selectors.getTurnsList(state),
         reverse: selectors.getReverse(state),
+        playedCards : selectors.getPlayedCards(state),
     }),
     dispatch => ({
         connectWS() {

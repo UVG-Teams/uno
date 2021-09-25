@@ -331,6 +331,27 @@ const deck = (state = [], action) => {
     };
 };
 
+const playedCards = (state = [], action) => {
+    switch(action.type) {
+        case types.CLOSE_GAME_COMPLETED: {
+            return [];
+        };
+        case types.INITIAL_CARD_MOVED: {
+
+            return [...state, action.payload.moved_card];
+        };
+        case types.CARD_MOVED: {
+            if (action.payload.moved_to == 'currentPlayedCard') {
+
+                return [...state, action.payload.moved_card];
+            };
+
+            return state;
+        };
+        default: return state;
+    };
+};
+
 const changedColor = (state = null, action) => {
     switch(action.type) {
         case types.NEW_COLOR_CHANGED: {
@@ -416,6 +437,7 @@ export default combineReducers({
     turns,
     turnsList,
     reverse,
+    playedCards,
 });
 
 export const getGameInfo = state => state.gameInfo;
@@ -428,3 +450,4 @@ export const getChangedColor = state => state.changedColor;
 export const getTurns = state => state.turns;
 export const getTurnsList = state => state.turnsList;
 export const getReverse = state => state.reverse;
+export const getPlayedCards = state => state.playedCards;

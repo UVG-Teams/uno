@@ -22,3 +22,4 @@ export const getChangedColor = state => gameSelectors.getChangedColor(state.game
 export const getTurns = state => gameSelectors.getTurns(state.game);
 export const getTurnsList = state => gameSelectors.getTurnsList(state.game);
 export const getReverse = state => gameSelectors.getReverse(state.game);
+export const getPlayedCards = state => gameSelectors.getPlayedCards(state.game);
