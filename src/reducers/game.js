@@ -9,6 +9,7 @@ const _ = require("lodash");
 export const types = {
     CREATE_GAME_STARTED: 'CREATE_GAME_STARTED',
     JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
+    PLAY_GAME_STARTED: 'PLAY_GAME_STARTED',
     CLOSE_GAME_STARTED: 'CLOSE_GAME_STARTED',
     CLOSE_GAME_COMPLETED: 'CLOSE_GAME_COMPLETED',
     CURRENT_USER_INFO_SETTED: 'CURRENT_USER_INFO_SETTED',
@@ -27,6 +28,10 @@ export const types = {
     REVERSE_PLAYED: 'REVERSE_PLAYED',
     UNO_BUTTON_PRESSED: 'UNO_BUTTON_PRESSED',
     DECK_RESETED: 'DECK_RESETED',
+    GAME_STARTED: 'GAME_STARTED',
+    GAME_ENDED: 'GAME_ENDED',
+    GAME_WON: 'GAME_WON',
+    RECEIVE_GAME_WINNER: 'RECEIVE_GAME_WINNER',
 };
 
 export const actions = {
@@ -37,6 +42,9 @@ export const actions = {
     startJoiningGame: joinData => ({
         type: types.JOIN_GAME_STARTED,
         payload: joinData
+    }),
+    startPlayingGame: () => ({
+        type: types.PLAY_GAME_STARTED,
     }),
     startClosingGame: () => ({
         type: types.CLOSE_GAME_STARTED,
@@ -103,22 +111,71 @@ export const actions = {
         type: types.DECK_RESETED,
         payload: deck,
     }),
+    winGame: (payload) => ({
+        type: types.GAME_WON,
+        payload,
+    }),
+    receiveWinner: payload => ({
+        type: types.RECEIVE_GAME_WINNER,
+        payload,
+    }),
 };
+
+export const GAME_STATES = {
+    ROOM_CREATED: 'ROOM_CREATED',
+    PLAYING: 'PLAYING',
+    ENDED: 'ENDED',
+    WON: 'WON',
+}
 
 const gameInfo = (state = null, action) => {
     switch(action.type) {
         case types.GAME_INFO_RECEIVED: {
             return action.payload;
-        };
+        }
         case types.CREATE_GAME_STARTED: {
-            return action.payload;
-        };
+            return {
+                ...action.payload,
+                gameState: GAME_STATES.ROOM_CREATED,
+            };
+        }
         case types.JOIN_GAME_STARTED: {
             return action.payload;
-        };
+        }
         case types.CLOSE_GAME_COMPLETED: {
             return null;
-        };
+        }
+        case types.GAME_STARTED: {
+            return {
+                ...state,
+                gameState: GAME_STATES.PLAYING,
+            }
+        }
+        case types.GAME_ENDED: {
+            return {
+                ...state,
+                gameState: GAME_STATES.ENDED,
+            }
+        }
+        case types.GAME_WON: {
+            return {
+                ...state,
+                gameState: GAME_STATES.WON,
+                gameWinner: action.payload,
+            }
+        }
+        case types.RECEIVE_GAME_WINNER: {
+            return {
+                ...state,
+                winner: action.payload,
+            }
+        }
+        case types.PLAY_GAME_STARTED: {
+            return {
+                ...state,
+                started: true,
+            }
+        }
         default: return state;
     };
 };
@@ -138,7 +195,7 @@ const currentUserInfo = (state = {saidUNO: false}, action) => {
             }
         };
         case types.CARD_MOVED: {
-            const {payload} = action;
+            const { payload } = action;
             const newSaidUNO = payload.moved_to === state.username ? false : state.saidUNO;
             return {
                 ...state,
@@ -472,6 +529,7 @@ export const getMyCards = state => state.myCards;
 export const getPlayers = state => state.players;
 export const getDeck = state => state.deck;
 export const getChangedColor = state => state.changedColor;
+export const getGameState = state => state.gameInfo.gameState;
 export const getTurns = state => state.turns;
 export const getTurnsList = state => state.turnsList;
 export const getReverse = state => state.reverse;

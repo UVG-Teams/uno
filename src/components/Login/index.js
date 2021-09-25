@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from "react-router-dom";
 import { TextField, Button } from '@material-ui/core';
+import Modal from 'react-modal';
+import Markdown from 'markdown-to-jsx';
+
 
 import './styles.css';
 import * as selectors from '../../reducers';
@@ -11,9 +14,37 @@ import * as gameState from '../../reducers/game';
 
 const Login = ({ gameInfo, createGame, endgame, joinGame }) => {
 
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    const customStyles = {
+        content: {
+          top: '50%',
+          left: '50%',
+          right: 'auto',
+          bottom: 'auto',
+          marginRight: '-50%',
+          transform: 'translate(-50%, -50%)',
+          height: '50%',
+          width: '50%',
+        },
+    };
+
     const [username, setUsername] = useState('');
     const [roomCode, setRoomCode] = useState('');
     const [password, setPassword] = useState('');
+
+    const [post, setPost] = useState('');
+    useEffect(() => {
+        import('../../helpme.md')
+            .then(res => {
+                fetch(res.default)
+                    .then(res => res.text())
+                    .then(res => setPost(res))
+            })
+            .catch(err => console.log(err));
+    });
+
+
 
     if (gameInfo) {
         return <Redirect to="/game" />
@@ -80,6 +111,34 @@ const Login = ({ gameInfo, createGame, endgame, joinGame }) => {
                         <img src={ backCard } className='login_img2' alt=''/>
                         <img src={ backCard } className='login_img3' alt=''/>
                     </div>
+                </div>
+
+                <div style={{position:'absolute', right:'9%', top:'8%'}}>
+                    <Button
+                        onClick={ () => setIsOpen(true) }
+                        variant='contained'
+                        color='primary'
+                        style={{borderRadius:100, padding: 20}}
+                    >
+                        ?
+                    </Button>
+                </div>
+
+                {/* Modal help me */}
+                <div>
+                    <Modal
+                        isOpen={modalIsOpen}
+                        onRequestClose={() => setIsOpen(false)}               
+                        contentLabel="Example Modal"
+                        style={customStyles}
+                    >
+                        <div>
+                            <Markdown>
+                                {post}
+                            </Markdown>
+                        </div>
+
+                    </Modal>
                 </div>
 
             </div>
