@@ -484,7 +484,7 @@ const Game = ({
     } else {
         table_card_color = table_card.map(card => card.content.split("_")[0]);
     }
-
+    
     return (
         <div className={table_card_color == 'red' ? ['game_page bRed'] : table_card_color == 'green' ? ['game_page bGreen'] : table_card_color == 'blue' ? ['game_page bBlue'] : ['game_page bYellow']}>
             {console.log(changedColor)}
@@ -982,18 +982,21 @@ export default connect(
         winGame(username) {
             dispatch(gameState.actions.winGame(username));
         },
-        changeTurn(gameInfo, currentUser, socket, socket_send, turns, reverse) {
+        changeTurn(gameInfo, currentUser, socket, socket_send, turns, turnsList, turnsNumber, reverse) {
             if(reverse){
-                turns = turns * (-1);
+                turnsNumber = turnsNumber * (-1);
             };
+            if((turns+turnsNumber)<0){
+                turnsNumber = turnsNumber + turnsList.length
+            }
             socket_send(gameInfo, socket, {
                 type: 'change_turn',
                 roomCode: gameInfo.roomCode,
                 sent_by: currentUser.username,
-                turns: turns,
+                turns: turnsNumber,
             });
 
-            dispatch(gameState.actions.changeTurn(turns));
+            dispatch(gameState.actions.changeTurn(turnsNumber));
         },
         receiveChangeTurn(messageData) {
             dispatch(gameState.actions.changeTurn(messageData.turns))
@@ -1066,8 +1069,8 @@ export default connect(
         changeColor(color, colorEsp=null) {
             dispatchProps.changeColor(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, color, colorEsp);
         },
-        changeTurn(turns, reverse) {
-            dispatchProps.changeTurn(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, turns, reverse);
+        changeTurn(turnsNumber, reverse) {
+            dispatchProps.changeTurn(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, stateProps.turns, stateProps.turnsList, turnsNumber, reverse);
         },
         takeXCards(players, turns, cardsNumber) {
             dispatchProps.takeXCards(stateProps.gameInfo, stateProps.currentUser, stateProps.socket, dispatchProps.socket_send, players, turns, cardsNumber);
