@@ -936,6 +936,8 @@ export default connect(
                 color: color,
             });
 
+            let message;
+
             if(color !== null){
                 socket_send(gameInfo, socket, {
                     type: 'text',
@@ -944,18 +946,21 @@ export default connect(
                     text: 'Cambie el color a ' + colorEsp,
                     sent_at: Date.now(),
                 });
+
+                message = {
+                    type: 'text',
+                    roomCode: gameInfo.roomCode,
+                    sent_by: currentUser.username,
+                    text: 'Cambie el color a ' + colorEsp,
+                    sent_at: Date.now(),
+                };
             };
 
-            const message = {
-                type: 'text',
-                roomCode: gameInfo.roomCode,
-                sent_by: currentUser.username,
-                text: 'Cambie el color a ' + colorEsp,
-                sent_at: Date.now(),
-            }
+
             dispatch(gameState.actions.changeNewColor({
                 color: color,
             }));
+
             dispatch(chatState.actions.sendMessage(message));
 
         },
