@@ -1,9 +1,11 @@
 import { combineReducers } from 'redux';
 import { v4 as uuidv4 } from 'uuid';
 
+import { shuffle } from 'lodash/shuffle'
+
 const COLORS = ['blue', 'green', 'red', 'yellow'];
 const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-
+const _ = require("lodash"); 
 export const types = {
     CREATE_GAME_STARTED: 'CREATE_GAME_STARTED',
     JOIN_GAME_STARTED: 'JOIN_GAME_STARTED',
@@ -24,6 +26,7 @@ export const types = {
     TURNS_RECEIVED: 'TURNS_RECEIVED',
     REVERSE_PLAYED: 'REVERSE_PLAYED',
     UNO_BUTTON_PRESSED: 'UNO_BUTTON_PRESSED',
+    DECK_RESETED: 'DECK_RESETED',
 };
 
 export const actions = {
@@ -95,6 +98,10 @@ export const actions = {
     pressUno: payload => ({
         type: types.UNO_BUTTON_PRESSED,
         payload,
+    }),
+    resetDeck: deck => ({
+        type: types.DECK_RESETED,
+        payload: deck,
     }),
 };
 
@@ -266,6 +273,10 @@ const deck = (state = [], action) => {
         case types.CLOSE_GAME_COMPLETED: {
             return [];
         };
+        case types.DECK_RESETED: {
+            state = _.shuffle(action.payload)
+            return state;
+        }
         case types.INITIAL_CARD_MOVED: {
             const newState = [];
 
@@ -319,8 +330,19 @@ const deck = (state = [], action) => {
             );
 
             const returnedValue = [...cards_numbers, ...action_cards, ...wild_cards].map(value => value.flat()).flat().sort(() => Math.random() - 0.5);
-
-            return returnedValue.map(card => {
+            let deck = _.shuffle(_.shuffle(returnedValue))
+            let cont = true
+            while(cont){
+                const initialCard = deck.pop()
+                if(initialCard.content.split("_")[0]=='wild'){
+                    console.log('salio wild')
+                    deck.push(initialCard)
+                    deck = _.shuffle(deck)
+                }else{
+                    cont = false
+                }
+            }
+            return deck.map(card => {
                 return {
                     ...card,
                     id: uuidv4()
@@ -335,6 +357,9 @@ const playedCards = (state = [], action) => {
     switch(action.type) {
         case types.CLOSE_GAME_COMPLETED: {
             return [];
+        };
+        case types.DECK_RESETED: {
+            return [action.payload.pop()]
         };
         case types.INITIAL_CARD_MOVED: {
 

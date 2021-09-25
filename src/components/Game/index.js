@@ -94,6 +94,8 @@ const Game = ({
     reverse,
     socket_send,
     playedCards,
+    resetDeck,
+    receiveResetDeck,
 }) => {
     useEffect(() => {
         // Validate if the websocket connection exists already
@@ -279,8 +281,12 @@ const Game = ({
                     };
                     case 'reverse_turn': {
                         receiveReverse(body);
-                        break
+                        break;
                     };
+                    case 'reset_deck': {
+                        receiveResetDeck(body);
+                        break;
+                    }
                     case 'error_alert': {
                         if (body.sent_to == currentUser.username && deck.length <= 0) {
                             receiveChatMessage({
@@ -387,8 +393,7 @@ const Game = ({
 
         };
     };
-    console.log(deck)
-    console.log(playedCards)
+
     return (
         <div className='game_page'>
             <div className='room_name_background'>
@@ -463,13 +468,13 @@ const Game = ({
                         <div className='table_deck_droppable'>
                             {
                                 deck.length > 0 ? (
-                                    <Button style={{pointerEvents: `${turnsList[turns%turnsList.length]!==undefined ? (turnsList[turns%turnsList.length].username !== currentUser.username ? 'none': '' ) : ''}`}} onClick={() => {
+                                    <Button  onClick={() => {
                                         takeCard();
                                         changeTurn(1, reverse);
                                     }}>
                                         <img src={ deck_1 } className='take_card'/>
                                     </Button>
-                                ) : (<></>)
+                                ) : ( gameInfo.roomOwner == currentUser.username ?  resetDeck(gameInfo, currentUser, socket , socket_send, playedCards): (<></>))
                             }
                             <Droppable droppableId='playedDeck'>
                                 {(provided, snapshot) => (
@@ -778,6 +783,19 @@ export default connect(
         receiveReverse(messageData){
             dispatch(gameState.actions.playReverse());
         },
+        resetDeck(gameInfo, currentUser, socket , socket_send, playedCards){
+            socket_send(gameInfo, socket, {
+                type: 'reset_deck',
+                roomCode: gameInfo. roomCode,
+                sent_by: currentUser.username,
+                playedCards: playedCards,
+            });
+
+            dispatch(gameState.actions.resetDeck(playedCards))
+        },
+        receiveResetDeck(messageData){
+            dispatch(gameState.actions.resetDeck(messageData.playedCards))
+        }
     }),
     (stateProps, dispatchProps, ownProps) => ({
         ...ownProps,
